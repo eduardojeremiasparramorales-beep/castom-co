@@ -12,6 +12,9 @@ export async function POST(request: NextRequest) {
     if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
       return NextResponse.json({ error: "Missing signature" }, { status: 400 });
     }
+    if (!stripe) {
+      return NextResponse.json({ error: "Pasarela de pago no configurada" }, { status: 500 });
+    }
 
     let event;
     try {

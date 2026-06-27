@@ -84,6 +84,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Create Stripe session
+    if (!stripe) {
+      return NextResponse.json({ error: "Pasarela de pago no configurada" }, { status: 500 });
+    }
     const stripeSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
