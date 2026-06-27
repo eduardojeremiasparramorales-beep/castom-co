@@ -1,36 +1,21 @@
-export const dynamic = "force-dynamic";
-
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.text();
-    const sig = request.headers.get("stripe-signature");
+    const body = await request.json();
+    const event = body?.event;
+    const transaction = body?.data?.transaction;
 
-    if (!sig || !process.env.STRIPE_WEBHOOK_SECRET) {
-      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
-    }
-    if (!stripe) {
-      return NextResponse.json({ error: "Pasarela de pago no configurada" }, { status: 500 });
+    if (!event || !transaction) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    } catch (err: any) {
-      console.error("Webhook signature verification failed:", err?.message);
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
-
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as any;
-      const orderId = session?.metadata?.orderId;
-
-      if (orderId) {
+    if (event === "transaction.updated" && transaction.status === "APPROVED") {
+      const reference = transaction.reference;
+      if (reference) {
         await prisma.order.update({
-          where: { id: orderId },
+          where: { orderNumber: reference },
           data: { status: "pagado" },
         });
       }

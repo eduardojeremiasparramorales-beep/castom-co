@@ -227,12 +227,12 @@ export function CheckoutClient() {
                 ) : (
                   <>
                     <CreditCard size={18} />
-                    Pagar con Stripe
+                    Pagar con Nequi / Bancolombia
                   </>
                 )}
               </button>
 
-              <p className="text-xs opacity-40 mt-3 text-center">Pago seguro procesado por Stripe</p>
+              <p className="text-xs opacity-40 mt-3 text-center">Pago seguro procesado por Wompi</p>
             </div>
           </div>
         </div>

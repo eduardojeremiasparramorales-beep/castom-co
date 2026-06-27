@@ -1,7 +1,5 @@
-export const dynamic = "force-dynamic";
-
 import { NextRequest, NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { createWompiTransaction } from "@/lib/wompi";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -10,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { items, customerInfo } = body ?? {};
-    const origin = request.headers.get("origin") ?? "";
+    const origin = request.headers.get("origin") ?? "https://castom.co";
 
     if (!items?.length || !customerInfo?.name || !customerInfo?.email) {
       return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
@@ -19,36 +17,21 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id ?? null;
 
-    // Calculate totals
     let subtotal = 0;
     let total = 0;
-    const lineItems: any[] = [];
 
     for (const item of items) {
       const regularPrice = (item?.price ?? 0) * (item?.quantity ?? 1);
       subtotal += regularPrice;
-
       let unitPrice = item?.price ?? 0;
       if (item?.wholesalePrice && (item?.quantity ?? 0) >= (item?.wholesaleMinQty ?? 6)) {
         unitPrice = item.wholesalePrice;
       }
       total += unitPrice * (item?.quantity ?? 1);
-
-      lineItems.push({
-        price_data: {
-          currency: "cop",
-          product_data: {
-            name: `${item?.name ?? "Producto"}${item?.variantName ? ` - ${item.variantName}` : ""}`,
-          },
-          unit_amount: Math.round(unitPrice * 100),
-        },
-        quantity: item?.quantity ?? 1,
-      });
     }
 
     const orderNumber = `CST-${Date.now().toString(36).toUpperCase()}`;
 
-    // Create order in DB
     const order = await prisma.order.create({
       data: {
         orderNumber,
@@ -83,29 +66,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create Stripe session
-    if (!stripe) {
-      return NextResponse.json({ error: "Pasarela de pago no configurada" }, { status: 500 });
-    }
-    const stripeSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${origin}/pedido/confirmacion?order=${order.orderNumber}`,
-      cancel_url: `${origin}/carrito`,
-      customer_email: customerInfo.email,
-      metadata: {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
-      },
+    const wompiTx = await createWompiTransaction({
+      amountInCents: Math.round(total),
+      currency: "COP",
+      customerEmail: customerInfo.email,
+      reference: orderNumber,
+      redirectUrl: `${origin}/pedido/confirmacion?order=${orderNumber}`,
     });
+
+    if (!wompiTx) {
+      return NextResponse.json({ error: "Pasarela de pago no disponible" }, { status: 500 });
+    }
 
     await prisma.order.update({
       where: { id: order.id },
-      data: { stripeSessionId: stripeSession.id },
+      data: { stripeSessionId: wompiTx.id },
     });
 
-    return NextResponse.json({ url: stripeSession.url, orderNumber: order.orderNumber });
+    return NextResponse.json({ url: wompiTx?.redirect_url ?? wompiTx?.url });
   } catch (error: any) {
     console.error("Checkout error:", error);
     return NextResponse.json({ error: "Error al procesar el pago" }, { status: 500 });
