@@ -227,12 +227,12 @@ export function CheckoutClient() {
                 ) : (
                   <>
                     <CreditCard size={18} />
-                    Pagar con Nequi / Bancolombia
+                    Confirmar Pedido
                   </>
                 )}
               </button>
 
-              <p className="text-xs opacity-40 mt-3 text-center">Pago seguro procesado por Wompi</p>
+              <p className="text-xs opacity-40 mt-3 text-center">Te contactaremos para coordinar el pago por Nequi o Bancolombia</p>
             </div>
           </div>
         </div>

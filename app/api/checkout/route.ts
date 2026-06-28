@@ -1,5 +1,6 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
-import { createWompiTransaction } from "@/lib/wompi";
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const orderNumber = `CST-${Date.now().toString(36).toUpperCase()}`;
 
-    const order = await prisma.order.create({
+    await prisma.order.create({
       data: {
         orderNumber,
         status: "pendiente",
@@ -66,26 +67,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const wompiTx = await createWompiTransaction({
-      amountInCents: Math.round(total),
-      currency: "COP",
-      customerEmail: customerInfo.email,
-      reference: orderNumber,
-      redirectUrl: `${origin}/pedido/confirmacion?order=${orderNumber}`,
-    });
-
-    if (!wompiTx) {
-      return NextResponse.json({ error: "Pasarela de pago no disponible" }, { status: 500 });
-    }
-
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { stripeSessionId: wompiTx.id },
-    });
-
-    return NextResponse.json({ url: wompiTx?.redirect_url ?? wompiTx?.url });
+    return NextResponse.json({ url: `${origin}/pedido/confirmacion?order=${orderNumber}` });
   } catch (error: any) {
     console.error("Checkout error:", error);
-    return NextResponse.json({ error: "Error al procesar el pago" }, { status: 500 });
+    return NextResponse.json({ error: "Error al procesar el pedido" }, { status: 500 });
   }
 }

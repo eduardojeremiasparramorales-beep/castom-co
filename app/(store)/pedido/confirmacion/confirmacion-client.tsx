@@ -30,7 +30,7 @@ export function ConfirmacionClient() {
           </div>
         )}
         <p className="mt-6 text-sm opacity-50">
-          Recibirás un email de confirmación con los detalles de tu pedido.
+          Recibirás un email con los detalles de tu pedido. Te contactaremos para coordinar el pago por Nequi o Bancolombia.
         </p>
         <Link
           href="/tienda"
