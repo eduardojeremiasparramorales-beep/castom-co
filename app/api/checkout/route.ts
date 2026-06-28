@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const orderNumber = `CST-${Date.now().toString(36).toUpperCase()}`;
 
-    await prisma.order.create({
+    const order = await prisma.order.create({
       data: {
         orderNumber,
         status: "pendiente",
@@ -67,7 +67,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ url: `${origin}/pedido/confirmacion?order=${orderNumber}` });
+    return NextResponse.json({
+      url: `${origin}/pedido/confirmacion?order=${orderNumber}&total=${Math.round(total)}`,
+      orderNumber,
+      total,
+    });
   } catch (error: any) {
     console.error("Checkout error:", error);
     return NextResponse.json({ error: "Error al procesar el pedido" }, { status: 500 });
