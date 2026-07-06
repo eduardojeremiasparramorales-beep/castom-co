@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         images: { orderBy: { position: "asc" } },
         category: true,
         variants: true,
+        priceTiers: { orderBy: { minQty: "asc" } },
       },
       orderBy: { createdAt: "desc" },
       take: limit,

@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, Tag, ShoppingCart, Handshake, ArrowUpRight, Globe } from "lucide-react";
+import { Package, Tag, ShoppingCart, Handshake, ArrowUpRight, Globe, TrendingDown, UserPlus } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { motion } from "framer-motion";
 
 export function MayoristasClient() {
+  const { data: session } = useSession() || {};
   const [products, setProducts] = useState<any[]>([]);
+
+  const user = session?.user as any;
+  const canWholesale = user?.wholesaleStatus === "approved" || user?.role === "admin";
 
   useEffect(() => {
     fetch("/api/products?limit=50")
@@ -42,6 +47,26 @@ export function MayoristasClient() {
               <span className="text-5xl font-extrabold bg-white px-4 py-2 rounded-lg" style={{ color: "#1B2B5E" }}>6</span>
               <p className="text-white/60 text-sm uppercase tracking-wider">unidades</p>
             </div>
+
+            {/* CTA for non-approved users */}
+            {!canWholesale && (
+              <div className="mt-8">
+                <Link
+                  href={session ? "/mayoristas/solicitar" : "/registro"}
+                  className="inline-flex items-center gap-2 px-6 py-3 text-[#1B2B5E] font-bold text-sm uppercase tracking-wider rounded-md bg-white hover:opacity-90 transition-opacity"
+                >
+                  <UserPlus size={18} />
+                  {session ? "Solicitar Acceso Mayorista" : "Regístrate y Solicita Acceso"}
+                </Link>
+              </div>
+            )}
+            {canWholesale && (
+              <div className="mt-8">
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-300 text-sm font-bold rounded-md">
+                  <Tag size={16} /> Acceso mayorista activo
+                </span>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -68,9 +93,35 @@ export function MayoristasClient() {
         </div>
       </section>
 
+      {/* Condition for non-approved */}
+      {!canWholesale && (
+        <section className="py-12 text-center">
+          <div className="max-w-[600px] mx-auto px-4">
+            <div className="p-8 rounded-lg border-2 border-dashed" style={{ borderColor: "#1B2B5E" }}>
+              <TrendingDown size={48} className="mx-auto mb-4" style={{ color: "#1B2B5E" }} />
+              <h2 className="text-xl font-bold font-display mb-2" style={{ color: "#1B2B5E" }}>
+                Precios Exclusivos para Mayoristas
+              </h2>
+              <p className="text-sm opacity-60 mb-6">
+                Registra tu empresa y obtén acceso a precios especiales por volumen.
+                Una vez aprobado, podrás ver todos los precios mayoristas y niveles de precio.
+              </p>
+              <Link
+                href={session ? "/mayoristas/solicitar" : "/registro"}
+                className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold text-sm uppercase tracking-wider rounded-md"
+                style={{ background: "#1B2B5E" }}
+              >
+                <UserPlus size={18} />
+                {session ? "Solicitar Acceso" : "Registrarme"}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Wholesale Products */}
       {products.length > 0 && (
-        <section className="py-12 md:py-16 bg-gray-50">
+        <section className={`py-12 md:py-16 ${canWholesale ? "bg-gray-50" : "opacity-50 pointer-events-none"}`}>
           <div className="max-w-[1200px] mx-auto px-4">
             <h2 className="text-2xl font-extrabold font-display tracking-tight mb-8 text-center" style={{ color: "#1B2B5E" }}>
               Productos con Precio Mayorista

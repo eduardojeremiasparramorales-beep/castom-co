@@ -28,12 +28,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     const product = await prisma.product.update({
       where: { id: params.id },
       data: updateData,
-      include: { images: true, category: true, variants: true },
+      include: { images: true, category: true, variants: true, priceTiers: true },
     });
 
     // Handle images update if provided
     if (images && Array.isArray(images)) {
-      // Delete existing and recreate
       await prisma.productImage.deleteMany({ where: { productId: params.id } });
       for (let i = 0; i < images.length; i++) {
         await prisma.productImage.create({
@@ -51,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const updated = await prisma.product.findUnique({
       where: { id: params.id },
-      include: { images: true, category: true, variants: true },
+      include: { images: true, category: true, variants: true, priceTiers: true },
     });
 
     return NextResponse.json(updated);

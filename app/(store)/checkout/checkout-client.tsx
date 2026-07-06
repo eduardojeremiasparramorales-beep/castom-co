@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { getCart, getCartTotal, clearCart, type CartItem } from "@/lib/cart";
-import { CreditCard, ArrowLeft, Loader2 } from "lucide-react";
+import { CreditCard, ArrowLeft, Loader2, Landmark, Truck } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -14,6 +14,7 @@ export function CheckoutClient() {
   const { data: session } = useSession() || {};
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<string>("nequi");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -51,7 +52,7 @@ export function CheckoutClient() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, customerInfo: form }),
+        body: JSON.stringify({ items, customerInfo: form, paymentMethod }),
       });
       const data = await res.json();
 
@@ -62,7 +63,11 @@ export function CheckoutClient() {
 
       if (data?.url) {
         clearCart();
-        window.location.href = data.url;
+        if (paymentMethod === "transfer" || paymentMethod === "contraentrega") {
+          window.location.href = data.url;
+        } else {
+          window.location.href = data.url;
+        }
       } else {
         toast.error("No se pudo iniciar el pago");
       }
@@ -179,6 +184,39 @@ export function CheckoutClient() {
                 />
               </div>
             </div>
+
+            {/* Payment Method */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border">
+              <h2 className="font-bold text-lg mb-4" style={{ color: "#1B2B5E" }}>Método de Pago</h2>
+              <div className="space-y-3">
+                <label className={`flex items-center gap-3 p-4 rounded-md border-2 cursor-pointer transition-all ${paymentMethod === "nequi" ? "border-[#1B2B5E] bg-gray-50" : "border-gray-200 hover:border-gray-400"}`}>
+                  <input type="radio" name="payment" value="nequi" checked={paymentMethod === "nequi"} onChange={() => setPaymentMethod("nequi")} className="w-4 h-4" />
+                  <CreditCard size={20} style={{ color: "#1B2B5E" }} />
+                  <div>
+                    <span className="text-sm font-bold block">Nequi / Bancolombia</span>
+                    <span className="text-xs opacity-50">Te contactaremos para coordinar el pago</span>
+                  </div>
+                </label>
+
+                <label className={`flex items-center gap-3 p-4 rounded-md border-2 cursor-pointer transition-all ${paymentMethod === "transfer" ? "border-[#1B2B5E] bg-gray-50" : "border-gray-200 hover:border-gray-400"}`}>
+                  <input type="radio" name="payment" value="transfer" checked={paymentMethod === "transfer"} onChange={() => setPaymentMethod("transfer")} className="w-4 h-4" />
+                  <Landmark size={20} style={{ color: "#1B2B5E" }} />
+                  <div>
+                    <span className="text-sm font-bold block">Transferencia Bancaria</span>
+                    <span className="text-xs opacity-50">Recibirás los datos para la transferencia</span>
+                  </div>
+                </label>
+
+                <label className={`flex items-center gap-3 p-4 rounded-md border-2 cursor-pointer transition-all ${paymentMethod === "contraentrega" ? "border-[#1B2B5E] bg-gray-50" : "border-gray-200 hover:border-gray-400"}`}>
+                  <input type="radio" name="payment" value="contraentrega" checked={paymentMethod === "contraentrega"} onChange={() => setPaymentMethod("contraentrega")} className="w-4 h-4" />
+                  <Truck size={20} style={{ color: "#1B2B5E" }} />
+                  <div>
+                    <span className="text-sm font-bold block">Pago Contraentrega</span>
+                    <span className="text-xs opacity-50">Solo disponible en Acacías, Meta - pagas al recibir</span>
+                  </div>
+                </label>
+              </div>
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -226,13 +264,29 @@ export function CheckoutClient() {
                   <Loader2 size={18} className="animate-spin" />
                 ) : (
                   <>
-                    <CreditCard size={18} />
+                    {paymentMethod === "transfer" ? <Landmark size={18} /> : paymentMethod === "contraentrega" ? <Truck size={18} /> : <CreditCard size={18} />}
                     Confirmar Pedido
                   </>
                 )}
               </button>
 
-              <p className="text-xs opacity-40 mt-3 text-center">Te contactaremos para coordinar el pago por Nequi o Bancolombia</p>
+              {paymentMethod === "transfer" && (
+                <div className="mt-4 p-3 bg-blue-50 rounded-md text-xs text-blue-800 border border-blue-200">
+                  <p className="font-semibold mb-1">Transferencia Bancaria:</p>
+                  <p>Te enviaremos un correo con los datos bancarios para realizar la transferencia. Una vez confirmado el pago, procesaremos tu pedido.</p>
+                </div>
+              )}
+              {paymentMethod === "contraentrega" && (
+                <div className="mt-4 p-3 bg-green-50 rounded-md text-xs text-green-800 border border-green-200">
+                  <p className="font-semibold mb-1">Pago Contraentrega:</p>
+                  <p>Solo disponible para entregas en <strong>Acacías, Meta</strong>. Pagas en efectivo cuando recibas tu pedido.</p>
+                </div>
+              )}
+              {paymentMethod === "nequi" && (
+                <div className="mt-4 p-3 bg-purple-50 rounded-md text-xs text-purple-800 border border-purple-200">
+                  <p>Te contactaremos para coordinar el pago por Nequi o Bancolombia.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

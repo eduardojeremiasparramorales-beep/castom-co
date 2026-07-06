@@ -14,6 +14,11 @@ export function RegistroClient() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [wantWholesale, setWantWholesale] = useState(false);
+  const [companyName, setCompanyName] = useState("");
+  const [companyNIT, setCompanyNIT] = useState("");
+  const [ciudad, setCiudad] = useState("");
+  const [departamento, setDepartamento] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,12 +30,23 @@ export function RegistroClient() {
       toast.error("La contraseña debe tener al menos 6 caracteres");
       return;
     }
+    if (wantWholesale && (!companyName || !companyNIT || !ciudad || !departamento)) {
+      toast.error("Completa los datos de empresa para solicitar ser mayorista");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name, email, password,
+          companyName: wantWholesale ? companyName : undefined,
+          companyNIT: wantWholesale ? companyNIT : undefined,
+          city: wantWholesale ? ciudad : undefined,
+          department: wantWholesale ? departamento : undefined,
+          wantWholesale,
+        }),
       });
       const data = await res.json();
 
@@ -39,7 +55,6 @@ export function RegistroClient() {
         return;
       }
 
-      // Auto sign-in after signup
       const signInRes = await signIn?.("credentials", {
         email,
         password,
@@ -50,6 +65,9 @@ export function RegistroClient() {
         toast.error("Cuenta creada. Por favor inicia sesión.");
         router.replace("/login");
       } else {
+        if (wantWholesale) {
+          toast.success("Solicitud enviada. Te contactaremos pronto.");
+        }
         router.replace("/");
       }
     } catch {
@@ -108,6 +126,53 @@ export function RegistroClient() {
                 </button>
               </div>
             </div>
+
+            <div className="pt-2 border-t">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={wantWholesale}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWantWholesale(e.target.checked)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-semibold" style={{ color: "#1B2B5E" }}>
+                  Quiero comprar al por mayor
+                </span>
+              </label>
+            </div>
+
+            {wantWholesale && (
+              <div className="space-y-4 p-4 bg-gray-50 rounded-md border">
+                <p className="text-xs font-semibold uppercase tracking-wider opacity-50">Datos de empresa</p>
+                <div>
+                  <label className="text-sm font-semibold block mb-1">Nombre de la empresa</label>
+                  <input type="text" required value={companyName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyName(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md text-sm" />
+                </div>
+                <div>
+                  <label className="text-sm font-semibold block mb-1">NIT / RUT</label>
+                  <input type="text" required value={companyNIT}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyNIT(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-md text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-semibold block mb-1">Ciudad</label>
+                    <input type="text" required value={ciudad}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCiudad(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md text-sm" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold block mb-1">Departamento</label>
+                    <input type="text" required value={departamento}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDepartamento(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-md text-sm" />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <button
               type="submit" disabled={loading}
               className="w-full flex items-center justify-center gap-2 py-3 text-white font-bold text-sm uppercase tracking-wider rounded-md hover:opacity-90 disabled:opacity-50"

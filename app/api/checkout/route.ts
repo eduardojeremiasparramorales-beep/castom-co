@@ -8,15 +8,25 @@ import { authOptions } from "@/lib/auth-options";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { items, customerInfo } = body ?? {};
+    const { items, customerInfo, paymentMethod } = body ?? {};
     const origin = request.headers.get("origin") ?? "https://castom.co";
 
     if (!items?.length || !customerInfo?.name || !customerInfo?.email) {
       return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
     }
 
+    if (paymentMethod === "contraentrega") {
+      const city = (customerInfo?.city ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const dept = (customerInfo?.department ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (city !== "acacias" || dept !== "meta") {
+        return NextResponse.json({ error: "Contraentrega solo disponible en Acacías, Meta" }, { status: 400 });
+      }
+    }
+
     const session = await getServerSession(authOptions);
     const userId = (session?.user as any)?.id ?? null;
+    const user = userId ? await prisma.user.findUnique({ where: { id: userId } }) : null;
+    const canWholesale = user?.wholesaleStatus === "approved" || user?.role === "admin";
 
     let subtotal = 0;
     let total = 0;
@@ -25,7 +35,7 @@ export async function POST(request: NextRequest) {
       const regularPrice = (item?.price ?? 0) * (item?.quantity ?? 1);
       subtotal += regularPrice;
       let unitPrice = item?.price ?? 0;
-      if (item?.wholesalePrice && (item?.quantity ?? 0) >= (item?.wholesaleMinQty ?? 6)) {
+      if (canWholesale && item?.wholesalePrice && (item?.quantity ?? 0) >= (item?.wholesaleMinQty ?? 6)) {
         unitPrice = item.wholesalePrice;
       }
       total += unitPrice * (item?.quantity ?? 1);
@@ -36,7 +46,9 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        status: "pendiente",
+        status: paymentMethod === "contraentrega" ? "confirmado" : "pendiente",
+        paymentMethod: paymentMethod ?? null,
+        paymentStatus: paymentMethod === "contraentrega" ? "pending" : paymentMethod === "transfer" ? "pending" : null,
         subtotal,
         total,
         discount: subtotal - total,
@@ -51,7 +63,7 @@ export async function POST(request: NextRequest) {
         items: {
           create: items.map((item: any) => {
             let unitPrice = item?.price ?? 0;
-            if (item?.wholesalePrice && (item?.quantity ?? 0) >= (item?.wholesaleMinQty ?? 6)) {
+            if (canWholesale && item?.wholesalePrice && (item?.quantity ?? 0) >= (item?.wholesaleMinQty ?? 6)) {
               unitPrice = item.wholesalePrice;
             }
             return {
@@ -68,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      url: `${origin}/pedido/confirmacion?order=${orderNumber}&total=${Math.round(total)}`,
+      url: `${origin}/pedido/confirmacion?order=${orderNumber}&total=${Math.round(total)}&method=${paymentMethod ?? "nequi"}`,
       orderNumber,
       total,
     });

@@ -9,18 +9,25 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          String    @default("customer")
-  accounts      Account[]
-  sessions      Session[]
-  orders        Order[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id               String              @id @default(cuid())
+  name             String?
+  email            String              @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  role             String              @default("customer")
+  wholesaleStatus  String              @default("none")
+  companyName      String?
+  companyNIT       String?
+  city             String?
+  department       String?
+  membershipLevel  String              @default("bronze")
+  accounts         Account[]
+  sessions         Session[]
+  orders           Order[]
+  wholesaleRequests WholesaleRequest[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
 model Account {
@@ -84,6 +91,7 @@ model Product {
   category        Category        @relation(fields: [categoryId], references: [id])
   images          ProductImage[]
   variants        ProductVariant[]
+  priceTiers      PriceTier[]
   orderItems      OrderItem[]
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -131,6 +139,10 @@ model Order {
   city            String?
   department      String?
   notes           String?
+  paymentMethod   String?
+  paymentStatus   String?
+  bankReference   String?
+  shippingCost    Float       @default(0)
   stripeSessionId String?     @unique
   userId          String?
   user            User?       @relation(fields: [userId], references: [id])
@@ -155,6 +167,38 @@ model OrderItem {
   product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
+}
+
+model WholesaleRequest {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String
+  companyNIT  String
+  companyPhone String?
+  city        String
+  department  String
+  status      String   @default("pending")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model PriceTier {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQty          Int
+  maxQty          Int?
+  price           Float
+  membershipLevel String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([productId])
 }
 
 model ContactSubmission {

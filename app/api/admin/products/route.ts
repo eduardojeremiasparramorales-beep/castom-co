@@ -12,7 +12,12 @@ export async function GET() {
   }
 
   const products = await prisma.product.findMany({
-    include: { images: { orderBy: { position: "asc" } }, category: true, variants: true },
+    include: {
+      images: { orderBy: { position: "asc" } },
+      category: true,
+      variants: true,
+      priceTiers: { orderBy: { minQty: "asc" } },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -68,7 +73,7 @@ export async function POST(request: NextRequest) {
           })),
         },
       },
-      include: { images: true, category: true, variants: true },
+      include: { images: true, category: true, variants: true, priceTiers: true },
     });
 
     return NextResponse.json(product);

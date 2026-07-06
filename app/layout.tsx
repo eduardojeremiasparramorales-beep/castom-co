@@ -11,7 +11,7 @@ const jakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-di
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXTAUTH_URL || "http://localhost:3000"),
   title: "CASTOM.CO | Built Different. Made For You.",
   description: "Tienda de tecnología, ropa y accesorios. Precios mayoristas a partir de 6 unidades.",
   icons: {

@@ -30,6 +30,9 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          wholesaleStatus: user.wholesaleStatus,
+          companyName: user.companyName ?? undefined,
+          companyNIT: user.companyNIT ?? undefined,
         };
       },
     }),
@@ -42,6 +45,9 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user?.role;
         token.id = user?.id;
+        token.wholesaleStatus = user?.wholesaleStatus;
+        token.companyName = user?.companyName;
+        token.companyNIT = user?.companyNIT;
       }
       return token;
     },
@@ -49,6 +55,9 @@ export const authOptions: NextAuthOptions = {
       if (session?.user) {
         (session.user as any).role = token?.role;
         (session.user as any).id = token?.id;
+        (session.user as any).wholesaleStatus = token?.wholesaleStatus;
+        (session.user as any).companyName = token?.companyName;
+        (session.user as any).companyNIT = token?.companyNIT;
       }
       return session;
     },

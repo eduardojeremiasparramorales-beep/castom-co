@@ -6,14 +6,18 @@ declare module 'next-auth' {
     user: {
       id: string;
       role?: string;
-      // Add custom fields here
-    } & DefaultSession['user']; // includes name, email, image
+      wholesaleStatus?: string;
+      companyName?: string;
+      companyNIT?: string;
+    } & DefaultSession['user'];
   }
 
   interface User extends DefaultUser {
     id: string;
     role?: string;
-    // Mirror any fields added to Session['user'] above
+    wholesaleStatus?: string;
+    companyName?: string;
+    companyNIT?: string;
   }
 }
 
@@ -21,5 +25,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
     role?: string;
+    wholesaleStatus?: string;
+    companyName?: string;
+    companyNIT?: string;
   }
 }

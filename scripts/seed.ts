@@ -7,15 +7,34 @@ async function main() {
   console.log('Seeding database...');
 
   // Create admin user
-  const hashedPassword = await bcrypt.hash('johndoe123', 10);
+  const hashedPassword = await bcrypt.hash('castom.co', 10);
+  await prisma.user.upsert({
+    where: { email: 'admin@castom.co' },
+    update: {},
+    create: {
+      email: 'admin@castom.co',
+      name: 'Omar',
+      password: hashedPassword,
+      role: 'admin',
+      wholesaleStatus: 'approved',
+    },
+  });
+
+  // Demo customer user
+  const demoPassword = await bcrypt.hash('johndoe123', 10);
   await prisma.user.upsert({
     where: { email: 'john@doe.com' },
     update: {},
     create: {
       email: 'john@doe.com',
-      name: 'Admin',
-      password: hashedPassword,
-      role: 'admin',
+      name: 'Demo Cliente',
+      password: demoPassword,
+      role: 'customer',
+      wholesaleStatus: 'approved',
+      companyName: 'Demo Company SAS',
+      companyNIT: '900.123.456-7',
+      city: 'Acacías',
+      department: 'Meta',
     },
   });
 
@@ -180,6 +199,50 @@ async function main() {
           },
         });
       }
+    }
+  }
+
+  // Add price tiers to select products
+  const airpodsPro = await prisma.product.findUnique({ where: { slug: 'airpods-pro-2gen' } });
+  if (airpodsPro) {
+    const existingTiers = await prisma.priceTier.count({ where: { productId: airpodsPro.id } });
+    if (existingTiers === 0) {
+      await prisma.priceTier.createMany({
+        data: [
+          { productId: airpodsPro.id, minQty: 1, maxQty: 5, price: 899000 },
+          { productId: airpodsPro.id, minQty: 6, maxQty: 11, price: 749000 },
+          { productId: airpodsPro.id, minQty: 12, maxQty: 23, price: 699000 },
+          { productId: airpodsPro.id, minQty: 24, maxQty: null, price: 649000 },
+        ],
+      });
+    }
+  }
+
+  const hoodie = await prisma.product.findUnique({ where: { slug: 'hoodie-castom-premium' } });
+  if (hoodie) {
+    const existingTiers = await prisma.priceTier.count({ where: { productId: hoodie.id } });
+    if (existingTiers === 0) {
+      await prisma.priceTier.createMany({
+        data: [
+          { productId: hoodie.id, minQty: 1, maxQty: 5, price: 219000 },
+          { productId: hoodie.id, minQty: 6, maxQty: 11, price: 169000 },
+          { productId: hoodie.id, minQty: 12, maxQty: null, price: 149000 },
+        ],
+      });
+    }
+  }
+
+  const tee = await prisma.product.findUnique({ where: { slug: 'camiseta-castom-oversize' } });
+  if (tee) {
+    const existingTiers = await prisma.priceTier.count({ where: { productId: tee.id } });
+    if (existingTiers === 0) {
+      await prisma.priceTier.createMany({
+        data: [
+          { productId: tee.id, minQty: 1, maxQty: 5, price: 129000 },
+          { productId: tee.id, minQty: 6, maxQty: 11, price: 89000 },
+          { productId: tee.id, minQty: 12, maxQty: null, price: 79000 },
+        ],
+      });
     }
   }
 

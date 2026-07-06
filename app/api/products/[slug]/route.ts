@@ -14,6 +14,7 @@ export async function GET(
         images: { orderBy: { position: "asc" } },
         category: true,
         variants: true,
+        priceTiers: { orderBy: { minQty: "asc" } },
       },
     });
 

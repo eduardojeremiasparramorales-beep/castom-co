@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, Tag } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { ShoppingCart, Tag, TrendingDown } from "lucide-react";
 import { addToCart } from "@/lib/cart";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -12,8 +14,31 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { data: session } = useSession() || {};
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+
   const mainImage = product?.images?.[0]?.url ?? "/images/airpods-lineup.png";
   const hasWholesale = product?.wholesalePrice != null;
+  const user = session?.user as any;
+  const canWholesale = user?.wholesaleStatus === "approved" || user?.role === "admin";
+  const lowStock = product?.stock != null && product.stock > 0 && product.stock <= 5;
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    setTilt({ x: (y - 0.5) * 15, y: (x - 0.5) * -15 });
+    setGlowPos({ x: x * 100, y: y * 100 });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+    setIsHovered(false);
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -23,7 +48,7 @@ export function ProductCard({ product }: ProductCardProps) {
       productId: product?.id ?? "",
       name: product?.name ?? "Producto",
       price: product?.price ?? 0,
-      wholesalePrice: product?.wholesalePrice ?? null,
+      wholesalePrice: canWholesale ? (product?.wholesalePrice ?? null) : null,
       wholesaleMinQty: product?.wholesaleMinQty ?? 6,
       quantity: 1,
       imageUrl: mainImage,
@@ -42,34 +67,73 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+      style={{ perspective: "1200px" }}
     >
       <Link href={`/producto/${product?.slug ?? ""}`} className="group block">
-        <div className="bg-gray-50 rounded-lg overflow-hidden relative aspect-square">
-          <div className="relative w-full h-full">
-            <Image
-              src={mainImage}
-              alt={product?.name ?? "Producto"}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
+        <div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={handleMouseLeave}
+          className="card-3d-glow relative bg-gray-50 rounded-lg overflow-hidden"
+          style={{
+            transform: isHovered
+              ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-6px)`
+              : "rotateX(0deg) rotateY(0deg) translateY(0px)",
+            transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
+            boxShadow: isHovered
+              ? "0 20px 40px -10px rgba(27, 43, 94, 0.25), 0 0 0 1px rgba(27, 43, 94, 0.1)"
+              : "0 2px 8px rgba(0,0,0,0.04)",
+            transformStyle: "preserve-3d",
+            "--mouse-x": `${glowPos.x}%`,
+            "--mouse-y": `${glowPos.y}%`,
+          } as React.CSSProperties}
+        >
+          <div className="relative aspect-square">
+            <div className="relative w-full h-full">
+              <Image
+                src={mainImage}
+                alt={product?.name ?? "Producto"}
+                fill
+                className="object-cover transition-transform duration-700"
+                style={{
+                  transform: isHovered ? "scale(1.08)" : "scale(1)",
+                }}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              />
+            </div>
+
+            {/* 3D floating badges layer */}
+            <div style={{ transform: "translateZ(20px)" }}>
+              {hasWholesale && (
+                <span className="absolute top-3 left-3 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1" style={{ background: "#1B2B5E" }}>
+                  <Tag size={12} />
+                  MAYORISTA
+                </span>
+              )}
+              {lowStock && (
+                <span className="absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded bg-amber-100 text-amber-800 animate-pulse">
+                  ¡Quedan {product.stock}!
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={handleAddToCart}
+              className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300"
+              style={{
+                background: "#1B2B5E",
+                opacity: isHovered ? 1 : 0,
+                transform: isHovered ? "translateZ(30px) scale(1.1)" : "translateZ(0) scale(0.9)",
+              }}
+            >
+              <ShoppingCart size={16} />
+            </button>
           </div>
-          {hasWholesale && (
-            <span className="absolute top-3 left-3 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1" style={{ background: "#1B2B5E" }}>
-              <Tag size={12} />
-              MAYORISTA
-            </span>
-          )}
-          <button
-            onClick={handleAddToCart}
-            className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
-            style={{ background: "#1B2B5E" }}
-          >
-            <ShoppingCart size={16} />
-          </button>
         </div>
         <div className="mt-3 px-1">
           <p className="text-xs uppercase tracking-wider opacity-50 font-semibold">{product?.category?.name ?? ""}</p>
@@ -80,9 +144,14 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="font-bold text-base" style={{ color: "#1B2B5E" }}>
               {formatPrice(product?.price ?? 0)}
             </span>
-            {hasWholesale && (
+            {canWholesale && hasWholesale && (
               <span className="text-xs opacity-50">
                 Mayorista: {formatPrice(product?.wholesalePrice ?? 0)}
+              </span>
+            )}
+            {!canWholesale && hasWholesale && (
+              <span className="text-xs flex items-center gap-1 opacity-50">
+                <TrendingDown size={12} /> Precio especial
               </span>
             )}
           </div>
