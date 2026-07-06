@@ -5,23 +5,33 @@ import bcrypt from "bcryptjs";
 export async function GET() {
   const results: Record<string, unknown> = {};
 
+  const dbUrl = process.env.DATABASE_URL || "";
+  results.dbHost = dbUrl ? dbUrl.replace(/\/\/[^:]+:[^@]+@/, "//user:pass@").replace(/\?.*/, "") : "NOT SET";
+  results.hasDbUrl = !!process.env.DATABASE_URL;
+
   try {
-    results.step1 = "Conectando a DB...";
+    results.step1 = "Listando columnas de User...";
+    const columns: Array<{ column_name: string }> = await prisma.$queryRawUnsafe(
+      "SELECT column_name FROM information_schema.columns WHERE table_name = 'User' ORDER BY ordinal_position"
+    );
+    results.columns = columns.map((c) => c.column_name);
+
+    results.step2 = "Buscando admin@castom.co...";
     const user = await prisma.user.findUnique({
       where: { email: "admin@castom.co" },
     });
-    results.step2 = user ? "Usuario encontrado" : "Usuario NO encontrado";
+    results.step3 = user ? "Usuario encontrado" : "Usuario NO encontrado";
     results.userEmail = user?.email || null;
     results.hasPassword = !!user?.password;
     results.role = user?.role || null;
 
     if (user?.password) {
-      results.step3 = "Comparando password...";
+      results.step4 = "Comparando password...";
       const isValid = await bcrypt.compare("castom.co", user.password);
       results.passwordValid = isValid;
-      results.step4 = isValid ? "Password OK" : "Password INVALIDO";
+      results.step5 = isValid ? "Password OK" : "Password INVALIDO";
     } else {
-      results.step3 = "Saltando bcrypt (sin password)";
+      results.step4 = "Saltando bcrypt (sin password)";
     }
   } catch (error) {
     results.error = String(error);
