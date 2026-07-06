@@ -14,26 +14,48 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.log("[auth] credenciales incompletas");
+            return null;
+          }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+          console.log("[auth] buscando usuario:", credentials.email);
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
 
-        if (!user || !user?.password) return null;
+          console.log("[auth] usuario encontrado?", !!user);
+          if (!user) {
+            console.log("[auth] usuario no existe en DB");
+            return null;
+          }
 
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) return null;
+          console.log("[auth] tiene password?", !!user?.password);
+          if (!user?.password) {
+            console.log("[auth] usuario sin password en DB");
+            return null;
+          }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          wholesaleStatus: user.wholesaleStatus,
-          companyName: user.companyName ?? undefined,
-          companyNIT: user.companyNIT ?? undefined,
-        };
+          console.log("[auth] comparando password...");
+          const isValid = await bcrypt.compare(credentials.password, user.password);
+          console.log("[auth] password valido?", isValid);
+
+          if (!isValid) return null;
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            wholesaleStatus: user.wholesaleStatus,
+            companyName: user.companyName ?? undefined,
+            companyNIT: user.companyNIT ?? undefined,
+          };
+        } catch (error) {
+          console.error("[auth] ERROR en authorize:", error);
+          return null;
+        }
       },
     }),
   ],
