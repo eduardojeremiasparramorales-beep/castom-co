@@ -38,6 +38,8 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          light: 'hsl(var(--primary-light))',
+          glow: 'hsl(var(--primary-glow))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -54,6 +56,12 @@ const config: Config = {
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
+        },
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

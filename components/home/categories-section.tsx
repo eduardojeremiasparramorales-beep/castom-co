@@ -30,11 +30,11 @@ export function CategoriesSection() {
   }, []);
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50 relative overflow-hidden">
+    <section className="py-16 md:py-24 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#1B2B5E]/[0.02] rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#2D4A8E]/[0.02] rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-[1200px] mx-auto px-4 relative z-10">
@@ -45,7 +45,7 @@ export function CategoriesSection() {
           transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-extrabold font-display tracking-tight" style={{ color: "#1B2B5E" }}>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-display tracking-tight text-foreground">
             Categorías
           </h2>
           <motion.p
@@ -53,7 +53,7 @@ export function CategoriesSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mt-2 opacity-60"
+            className="mt-2 text-muted-foreground"
           >
             Explora nuestro catálogo por categoría
           </motion.p>

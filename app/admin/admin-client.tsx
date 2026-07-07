@@ -163,14 +163,14 @@ export function AdminClient() {
   }, [orders]);
 
   if (status === "loading") {
-    return <div className="flex items-center justify-center min-h-[400px]"><Loader2 className="animate-spin" size={32} /></div>;
+    return <div className="flex items-center justify-center min-h-[400px]"><Loader2 className="animate-spin text-primary" size={32} /></div>;
   }
 
   if (!isAdmin) {
     return (
       <div className="max-w-[1200px] mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold" style={{ color: "#1B2B5E" }}>Acceso Denegado</h1>
-        <p className="mt-2 opacity-50">No tienes permisos de administrador.</p>
+        <h1 className="text-2xl font-bold text-foreground">Acceso Denegado</h1>
+        <p className="mt-2 text-muted-foreground">No tienes permisos de administrador.</p>
       </div>
     );
   }
@@ -180,13 +180,13 @@ export function AdminClient() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold font-display tracking-tight" style={{ color: "#1B2B5E" }}>
+          <h1 className="text-3xl font-extrabold font-display tracking-tight text-foreground">
             Panel de Administración
           </h1>
-          <p className="text-sm opacity-50 mt-1">Bienvenido, {session?.user?.name || "Admin"}</p>
+          <p className="text-sm text-muted-foreground mt-1">Bienvenido, {session?.user?.name || "Admin"}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs opacity-40">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+          <span className="text-xs text-muted-foreground">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
       </div>
 
@@ -330,26 +330,26 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
       {/* Today + Alerts Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Today's orders */}
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-card rounded-xl border border-border/50 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Calendar size={14} /> Hoy
             </h3>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">{todayOrders.length} pedidos</span>
+            <span className="text-xs bg-primary/20 text-primary-light px-2 py-0.5 rounded-full font-bold">{todayOrders.length} pedidos</span>
           </div>
           {todayOrders.length === 0 ? (
-            <p className="text-sm opacity-40 text-center py-4">Sin pedidos hoy</p>
+            <p className="text-sm text-muted-foreground text-center py-4">Sin pedidos hoy</p>
           ) : (
-            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            <div className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-none">
               {todayOrders.map((o: any) => (
-                <div key={o.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50 last:border-0">
-                  <span className="font-mono text-xs opacity-60">{o.orderNumber}</span>
-                  <span className="font-semibold" style={{ color: "#1B2B5E" }}>{formatPrice(o.total || 0)}</span>
+                <div key={o.id} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30 last:border-0">
+                  <span className="font-mono text-xs text-muted-foreground">{o.orderNumber}</span>
+                  <span className="font-semibold text-foreground">{formatPrice(o.total || 0)}</span>
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                    o.status === "pagado" ? "bg-green-100 text-green-700" :
-                    o.status === "pendiente" ? "bg-yellow-100 text-yellow-700" :
-                    o.status === "enviado" ? "bg-purple-100 text-purple-700" :
-                    "bg-gray-100 text-gray-600"
+                    o.status === "pagado" ? "bg-success/20 text-success" :
+                    o.status === "pendiente" ? "bg-warning/20 text-warning" :
+                    o.status === "enviado" ? "bg-primary/20 text-primary-light" :
+                    "bg-muted text-muted-foreground"
                   }`}>
                     {statusLabels[o.status] || o.status}
                   </span>
@@ -360,27 +360,27 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
         </div>
 
         {/* Stock alerts */}
-        <div className="bg-white rounded-xl border p-4">
+        <div className="bg-card rounded-xl border border-border/50 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold uppercase tracking-wider opacity-60 flex items-center gap-1.5">
-              <AlertTriangle size={14} className="text-amber-500" /> Alertas de Stock
+            <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <AlertTriangle size={14} className="text-warning" /> Alertas de Stock
             </h3>
-            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">{stats.lowStockItems.length + stats.outOfStock.length}</span>
+            <span className="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full font-bold">{stats.lowStockItems.length + stats.outOfStock.length}</span>
           </div>
           {stats.lowStockItems.length === 0 && stats.outOfStock.length === 0 ? (
-            <p className="text-sm opacity-40 text-center py-4">Sin alertas</p>
+            <p className="text-sm text-muted-foreground text-center py-4">Sin alertas</p>
           ) : (
-            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            <div className="space-y-2 max-h-[200px] overflow-y-auto scrollbar-none">
               {stats.outOfStock.map((p: any) => (
-                <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50">
-                  <span className="text-sm">{p.name}</span>
-                  <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">Sin stock</span>
+                <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30">
+                  <span className="text-sm text-foreground">{p.name}</span>
+                  <span className="text-xs font-bold text-destructive-foreground bg-destructive/20 px-2 py-0.5 rounded">Sin stock</span>
                 </div>
               ))}
               {stats.lowStockItems.map((p: any) => (
-                <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50">
-                  <span className="text-sm">{p.name}</span>
-                  <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Quedan {p.stock}</span>
+                <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30">
+                  <span className="text-sm text-foreground">{p.name}</span>
+                  <span className="text-xs font-bold text-warning bg-warning/20 px-2 py-0.5 rounded">Quedan {p.stock}</span>
                 </div>
               ))}
             </div>
@@ -388,8 +388,8 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
         </div>
 
         {/* Status Pie */}
-        <div className="bg-white rounded-xl border p-4">
-          <h3 className="text-sm font-bold uppercase tracking-wider opacity-60 flex items-center gap-1.5 mb-3">
+        <div className="bg-card rounded-xl border border-border/50 p-4">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
             <PieChart size={14} /> Pedidos por Estado
           </h3>
           {orderStatusData.length === 0 ? (
@@ -423,28 +423,28 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
       </div>
 
       {/* Sales Chart */}
-      <div className="bg-white rounded-xl border p-4 md:p-6">
+      <div className="bg-card rounded-xl border border-border/50 p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "#1B2B5E" }}>
+          <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 text-foreground">
             <TrendingUp size={16} /> Ventas Mensuales
           </h3>
         </div>
         {stats.monthlyChart.length === 0 ? (
-          <p className="text-sm opacity-40 text-center py-8">Sin datos de ventas</p>
+          <p className="text-sm text-muted-foreground text-center py-8">Sin datos de ventas</p>
         ) : (
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.monthlyChart}>
                 <defs>
                   <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1B2B5E" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="#1B2B5E" stopOpacity={0.25} />
                     <stop offset="95%" stopColor="#1B2B5E" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} />
-                <Tooltip formatter={(value: number) => [new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(value), "Ventas"]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickLine={false} axisLine={false} tickFormatter={(v: number) => `$${(v / 1000000).toFixed(1)}M`} />
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }} formatter={(value: number) => [new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(value), "Ventas"]} />
                 <Area type="monotone" dataKey="sales" stroke="#1B2B5E" strokeWidth={2} fill="url(#salesGradient)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -468,29 +468,29 @@ function ProductsTab({ products, loading, categories, showForm, editingProduct, 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h2 className="font-bold text-lg" style={{ color: "#1B2B5E" }}>Productos</h2>
+        <h2 className="font-bold text-lg text-foreground">Productos</h2>
         <button
           onClick={onNewProduct}
-          className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-md"
+          className="flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-lg shadow-glow"
           style={{ background: "#1B2B5E" }}
         >
           <Plus size={16} /> Nuevo Producto
         </button>
       </div>
       {loading ? (
-        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto" /></div>
+        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto text-primary" /></div>
       ) : (
-        <div className="bg-white rounded-lg border overflow-x-auto">
+        <div className="bg-card rounded-xl border border-border/50 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="text-left p-3 font-semibold">Producto</th>
-                <th className="text-left p-3 font-semibold">Categoría</th>
-                <th className="text-right p-3 font-semibold">Precio</th>
-                <th className="text-right p-3 font-semibold">Mayorista</th>
-                <th className="text-right p-3 font-semibold">Stock</th>
-                <th className="text-center p-3 font-semibold">Estado</th>
-                <th className="text-center p-3 font-semibold">Acciones</th>
+              <tr className="border-b border-border/50 bg-secondary/50">
+                <th className="text-left p-3 font-semibold text-muted-foreground">Producto</th>
+                <th className="text-left p-3 font-semibold text-muted-foreground">Categoría</th>
+                <th className="text-right p-3 font-semibold text-muted-foreground">Precio</th>
+                <th className="text-right p-3 font-semibold text-muted-foreground">Mayorista</th>
+                <th className="text-right p-3 font-semibold text-muted-foreground">Stock</th>
+                <th className="text-center p-3 font-semibold text-muted-foreground">Estado</th>
+                <th className="text-center p-3 font-semibold text-muted-foreground">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -498,31 +498,31 @@ function ProductsTab({ products, loading, categories, showForm, editingProduct, 
                 const isLow = p.stock != null && p.stock > 0 && p.stock <= 5;
                 const isOut = p.stock === 0 || p.stock == null;
                 return (
-                  <tr key={p?.id} className={`border-b hover:bg-gray-50 ${isOut ? "bg-red-50" : isLow ? "bg-amber-50" : ""}`}>
+                  <tr key={p?.id} className={`border-b border-border/30 hover:bg-secondary/30 ${isOut ? "bg-destructive/5" : isLow ? "bg-warning/5" : ""}`}>
                     <td className="p-3">
                       <div className="flex items-center gap-3">
                         {p?.images?.[0]?.url && (
-                          <div className="relative w-10 h-10 rounded bg-gray-100 overflow-hidden flex-shrink-0">
+                          <div className="relative w-10 h-10 rounded bg-secondary overflow-hidden flex-shrink-0">
                             <Image src={p.images[0].url} alt="" fill className="object-cover" sizes="40px" />
                           </div>
                         )}
                         <div>
-                          <span className="font-semibold" style={{ color: "#1B2B5E" }}>{p?.name ?? ""}</span>
-                          <p className="text-xs opacity-40 font-mono">{p?.sku ?? ""}</p>
+                          <span className="font-semibold text-foreground">{p?.name ?? ""}</span>
+                          <p className="text-xs text-muted-foreground font-mono">{p?.sku ?? ""}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="p-3 opacity-60">{p?.category?.name ?? ""}</td>
-                    <td className="p-3 text-right font-semibold">{formatPrice(p?.price ?? 0)}</td>
-                    <td className="p-3 text-right">{p?.wholesalePrice ? formatPrice(p.wholesalePrice) : "-"}</td>
+                    <td className="p-3 text-muted-foreground">{p?.category?.name ?? ""}</td>
+                    <td className="p-3 text-right font-semibold text-foreground">{formatPrice(p?.price ?? 0)}</td>
+                    <td className="p-3 text-right text-muted-foreground">{p?.wholesalePrice ? formatPrice(p.wholesalePrice) : "-"}</td>
                     <td className="p-3 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        {isOut && <AlertTriangle size={12} className="text-red-500" />}
-                        {isLow && <AlertTriangle size={12} className="text-amber-500" />}
+                        {isOut && <AlertTriangle size={12} className="text-destructive" />}
+                        {isLow && <AlertTriangle size={12} className="text-warning" />}
                         <input
                           type="number"
                           defaultValue={p?.stock ?? 0}
-                          className={`w-16 px-2 py-1 border rounded text-right text-sm ${isOut ? "border-red-300" : isLow ? "border-amber-300" : ""}`}
+                          className={`w-16 px-2 py-1 bg-secondary border border-input rounded-lg text-right text-sm text-foreground ${isOut ? "border-destructive/50" : isLow ? "border-warning/50" : ""}`}
                           onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                             const val = parseInt(e.target.value);
                             if (!isNaN(val) && val !== p?.stock) onUpdateStock(p?.id, val);
@@ -531,14 +531,14 @@ function ProductsTab({ products, loading, categories, showForm, editingProduct, 
                       </div>
                     </td>
                     <td className="p-3 text-center">
-                      <span className={`px-2 py-1 text-xs font-bold rounded ${p?.active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                      <span className={`px-2 py-1 text-xs font-bold rounded ${p?.active ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive-foreground"}`}>
                         {p?.active ? "Activo" : "Inactivo"}
                       </span>
                     </td>
                     <td className="p-3 text-center">
                       <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => onEditProduct(p)} className="p-1.5 rounded hover:bg-gray-100" title="Editar"><Edit size={14} /></button>
-                        <button onClick={() => onToggleActive(p?.id, p?.active)} className="p-1.5 rounded hover:bg-gray-100" title={p?.active ? "Desactivar" : "Activar"}>
+                        <button onClick={() => onEditProduct(p)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors" title="Editar"><Edit size={14} /></button>
+                        <button onClick={() => onToggleActive(p?.id, p?.active)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors" title={p?.active ? "Desactivar" : "Activar"}>
                           {p?.active ? <EyeOff size={14} /> : <Eye size={14} />}
                         </button>
                       </div>
@@ -564,68 +564,68 @@ function OrdersTab({ orders, loading, formatPrice, formatDate, search, onSearchC
   return (
     <div>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-        <h2 className="font-bold text-lg" style={{ color: "#1B2B5E" }}>Pedidos</h2>
+        <h2 className="font-bold text-lg text-foreground">Pedidos</h2>
         <div className="flex items-center gap-2">
           {/* Search */}
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text" placeholder="Buscar pedido..."
               value={search} onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-              className="pl-8 pr-3 py-1.5 border rounded-md text-sm w-48" />
+              className="pl-8 pr-3 py-1.5 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 w-48 focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </div>
           {/* Filter */}
-          <select value={filter} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onFilterChange(e.target.value)} className="px-2 py-1.5 border rounded-md text-sm">
+          <select value={filter} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onFilterChange(e.target.value)} className="px-2 py-1.5 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option value="all">Todos</option>
             {Object.entries(statusLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
-          <button onClick={onExport} className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-md border hover:bg-gray-50">
+          <button onClick={onExport} className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">
             <Download size={14} /> Exportar
           </button>
         </div>
       </div>
       {loading ? (
-        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto" /></div>
+        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto text-primary" /></div>
       ) : orders.length === 0 ? (
-        <p className="text-center py-8 opacity-50">No hay pedidos</p>
+        <p className="text-center py-8 text-muted-foreground">No hay pedidos</p>
       ) : (
         <div className="space-y-3">
           {orders.map((order: any) => {
             const isManual = order?.paymentMethod === "transfer" || order?.paymentMethod === "contraentrega";
             return (
-              <div key={order?.id} className="bg-white p-4 rounded-lg border hover:shadow-md transition-shadow">
+              <div key={order?.id} className="bg-card p-4 rounded-xl border border-border/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold font-mono" style={{ color: "#1B2B5E" }}>{order?.orderNumber ?? ""}</span>
+                    <span className="font-bold font-mono text-foreground">{order?.orderNumber ?? ""}</span>
                     <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                      order?.status === "pagado" ? "bg-green-100 text-green-700" :
-                      order?.status === "pendiente" ? "bg-yellow-100 text-yellow-700" :
-                      order?.status === "confirmado" ? "bg-blue-100 text-blue-700" :
-                      order?.status === "enviado" ? "bg-purple-100 text-purple-700" :
-                      order?.status === "entregado" ? "bg-green-100 text-green-700" :
-                      order?.status === "cancelado" ? "bg-red-100 text-red-600" :
-                      "bg-gray-100 text-gray-600"
+                      order?.status === "pagado" ? "bg-success/20 text-success" :
+                      order?.status === "pendiente" ? "bg-warning/20 text-warning" :
+                      order?.status === "confirmado" ? "bg-primary/20 text-primary-light" :
+                      order?.status === "enviado" ? "bg-primary/20 text-primary-light" :
+                      order?.status === "entregado" ? "bg-success/20 text-success" :
+                      order?.status === "cancelado" ? "bg-destructive/20 text-destructive-foreground" :
+                      "bg-muted text-muted-foreground"
                     }`}>
                       {statusLabels[order?.status] || order?.status}
                     </span>
                     {order?.paymentMethod && (
-                      <span className="px-2 py-0.5 text-xs rounded bg-gray-100">
+                      <span className="px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">
                         {order.paymentMethod === "transfer" ? "Transferencia" :
                          order.paymentMethod === "contraentrega" ? "Contraentrega" : "Nequi"}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs opacity-50">{formatDate(order?.createdAt)}</span>
+                  <span className="text-xs text-muted-foreground">{formatDate(order?.createdAt)}</span>
                 </div>
-                <div className="text-sm space-y-0.5">
-                  <p><strong>Cliente:</strong> {order?.customerName ?? ""} <span className="opacity-50">({order?.customerEmail ?? ""})</span></p>
+                <div className="text-sm space-y-0.5 text-foreground">
+                  <p><strong>Cliente:</strong> {order?.customerName ?? ""} <span className="text-muted-foreground">({order?.customerEmail ?? ""})</span></p>
                   {order?.shippingAddress && <p><strong>Dirección:</strong> {order.shippingAddress}, {order?.city ?? ""}</p>}
                   {(order?.items ?? []).length > 0 && (
                     <details className="mt-1">
-                      <summary className="text-xs opacity-60 cursor-pointer hover:opacity-100">Ver items ({order.items.length})</summary>
+                      <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">Ver items ({order.items.length})</summary>
                       <div className="mt-1 space-y-0.5">
                         {order.items.map((item: any) => (
-                          <p key={item?.id} className="text-xs opacity-60">
+                          <p key={item?.id} className="text-xs text-muted-foreground">
                             {item?.productName ?? ""} {item?.variantName ? `(${item.variantName})` : ""} x{item?.quantity ?? 0} — {formatPrice(item?.totalPrice ?? 0)}
                           </p>
                         ))}
@@ -633,29 +633,29 @@ function OrdersTab({ orders, loading, formatPrice, formatDate, search, onSearchC
                     </details>
                   )}
                 </div>
-                <div className="border-t pt-2 mt-2 flex justify-between items-center">
-                  <span className="text-xs opacity-40">
-                    {order?.paymentStatus === "paid" ? "✓ Pagado" : order?.paymentStatus === "pending" ? "⏳ Pendiente" : ""}
+                <div className="border-t border-border/30 pt-2 mt-2 flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">
+                    {order?.paymentStatus === "paid" ? "✓ Pagado" : order?.paymentStatus === "pending" ? "Pendiente" : ""}
                   </span>
-                  <span className="font-bold" style={{ color: "#1B2B5E" }}>{formatPrice(order?.total ?? 0)}</span>
+                  <span className="font-bold text-foreground">{formatPrice(order?.total ?? 0)}</span>
                 </div>
                 {(isManual || order?.status !== "entregado") && order?.status !== "cancelado" && (
-                  <div className="mt-3 pt-3 border-t flex gap-2 flex-wrap">
+                  <div className="mt-3 pt-3 border-t border-border/30 flex gap-2 flex-wrap">
                     {order?.status !== "pagado" && order?.status !== "entregado" && (
                       <button onClick={() => onUpdateStatus(order.id, { status: "pagado", paymentStatus: "paid" })}
-                        className="px-3 py-1.5 text-xs font-bold rounded-md bg-green-100 text-green-700 hover:bg-green-200">Marcar Pagado</button>
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-success/20 text-success hover:bg-success/30 transition-all">Marcar Pagado</button>
                     )}
                     {order?.status === "pagado" && (
                       <button onClick={() => onUpdateStatus(order.id, { status: "enviado" })}
-                        className="px-3 py-1.5 text-xs font-bold rounded-md bg-purple-100 text-purple-700 hover:bg-purple-200">Marcar Enviado</button>
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-primary/20 text-primary-light hover:bg-primary/30 transition-all">Marcar Enviado</button>
                     )}
                     {order?.status === "enviado" && (
                       <button onClick={() => onUpdateStatus(order.id, { status: "entregado" })}
-                        className="px-3 py-1.5 text-xs font-bold rounded-md bg-green-100 text-green-700 hover:bg-green-200">Marcar Entregado</button>
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-success/20 text-success hover:bg-success/30 transition-all">Marcar Entregado</button>
                     )}
                     {order?.status !== "cancelado" && order?.status !== "entregado" && (
                       <button onClick={() => onUpdateStatus(order.id, { status: "cancelado" })}
-                        className="px-3 py-1.5 text-xs font-bold rounded-md bg-red-100 text-red-600 hover:bg-red-200">Cancelar</button>
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-destructive/20 text-destructive-foreground hover:bg-destructive/30 transition-all">Cancelar</button>
                     )}
                   </div>
                 )}
@@ -679,52 +679,52 @@ function CustomersTab({ customers, loading, formatPrice, formatDate, onRefresh }
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-lg" style={{ color: "#1B2B5E" }}>Clientes</h2>
+        <h2 className="font-bold text-lg text-foreground">Clientes</h2>
         <input type="text" placeholder="Buscar cliente..." value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-          className="px-3 py-1.5 border rounded-md text-sm w-64" />
+          className="px-3 py-1.5 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 w-64 focus:outline-none focus:ring-2 focus:ring-primary/30" />
       </div>
       {loading ? (
-        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto" /></div>
+        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto text-primary" /></div>
       ) : filtered.length === 0 ? (
-        <p className="text-center py-8 opacity-50">No hay clientes registrados</p>
+        <p className="text-center py-8 text-muted-foreground">No hay clientes registrados</p>
       ) : (
-        <div className="bg-white rounded-lg border overflow-x-auto">
+        <div className="bg-card rounded-xl border border-border/50 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="text-left p-3 font-semibold">Cliente</th>
-                <th className="text-left p-3 font-semibold">Email</th>
-                <th className="text-left p-3 font-semibold">Empresa</th>
-                <th className="text-center p-3 font-semibold">Mayorista</th>
-                <th className="text-center p-3 font-semibold">Pedidos</th>
-                <th className="text-right p-3 font-semibold">Total Gastado</th>
-                <th className="text-center p-3 font-semibold">Registro</th>
+              <tr className="border-b border-border/50 bg-secondary/50">
+                <th className="text-left p-3 font-semibold text-muted-foreground">Cliente</th>
+                <th className="text-left p-3 font-semibold text-muted-foreground">Email</th>
+                <th className="text-left p-3 font-semibold text-muted-foreground">Empresa</th>
+                <th className="text-center p-3 font-semibold text-muted-foreground">Mayorista</th>
+                <th className="text-center p-3 font-semibold text-muted-foreground">Pedidos</th>
+                <th className="text-right p-3 font-semibold text-muted-foreground">Total Gastado</th>
+                <th className="text-center p-3 font-semibold text-muted-foreground">Registro</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((c: any) => (
-                <tr key={c.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 font-semibold" style={{ color: "#1B2B5E" }}>{c.name || "Sin nombre"}</td>
-                  <td className="p-3 opacity-60">{c.email}</td>
-                  <td className="p-3">{c.companyName || "-"}</td>
+                <tr key={c.id} className="border-b border-border/30 hover:bg-secondary/30">
+                  <td className="p-3 font-semibold text-foreground">{c.name || "Sin nombre"}</td>
+                  <td className="p-3 text-muted-foreground">{c.email}</td>
+                  <td className="p-3 text-foreground">{c.companyName || "-"}</td>
                   <td className="p-3 text-center">
                     <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                      c.wholesaleStatus === "approved" ? "bg-green-100 text-green-700" :
-                      c.wholesaleStatus === "pending" ? "bg-yellow-100 text-yellow-700" :
-                      c.wholesaleStatus === "rejected" ? "bg-red-100 text-red-600" :
-                      "bg-gray-100 text-gray-500"
+                      c.wholesaleStatus === "approved" ? "bg-success/20 text-success" :
+                      c.wholesaleStatus === "pending" ? "bg-warning/20 text-warning" :
+                      c.wholesaleStatus === "rejected" ? "bg-destructive/20 text-destructive-foreground" :
+                      "bg-muted text-muted-foreground"
                     }`}>
                       {c.wholesaleStatus === "approved" ? "Aprobado" :
                        c.wholesaleStatus === "pending" ? "Pendiente" :
                        c.wholesaleStatus === "rejected" ? "Rechazado" : "No aplica"}
                     </span>
                   </td>
-                  <td className="p-3 text-center font-semibold">{c._count?.orders || 0}</td>
-                  <td className="p-3 text-right font-semibold" style={{ color: "#1B2B5E" }}>
+                  <td className="p-3 text-center font-semibold text-foreground">{c._count?.orders || 0}</td>
+                  <td className="p-3 text-right font-semibold text-foreground">
                     {formatPrice(c._sum?.orders?.total || 0)}
                   </td>
-                  <td className="p-3 text-center text-xs opacity-50">{c.createdAt ? formatDate(c.createdAt) : "-"}</td>
+                  <td className="p-3 text-center text-xs text-muted-foreground">{c.createdAt ? formatDate(c.createdAt) : "-"}</td>
                 </tr>
               ))}
             </tbody>
@@ -739,38 +739,38 @@ function CustomersTab({ customers, loading, formatPrice, formatDate, onRefresh }
 function RequestsTab({ requests, loading, onApprove, onReject }: any) {
   return (
     <div>
-      <h2 className="font-bold text-lg mb-4" style={{ color: "#1B2B5E" }}>Solicitudes Mayoristas</h2>
+      <h2 className="font-bold text-lg mb-4 text-foreground">Solicitudes Mayoristas</h2>
       {loading ? (
-        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto" /></div>
+        <div className="text-center py-8"><Loader2 className="animate-spin mx-auto text-primary" /></div>
       ) : (requests ?? []).length === 0 ? (
-        <p className="text-center py-8 opacity-50">No hay solicitudes</p>
+        <p className="text-center py-8 text-muted-foreground">No hay solicitudes</p>
       ) : (
         <div className="space-y-4">
           {(requests ?? []).map((req: any) => (
-            <div key={req?.id} className="bg-white p-4 rounded-lg border">
+            <div key={req?.id} className="bg-card p-4 rounded-xl border border-border/50">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-bold" style={{ color: "#1B2B5E" }}>{req?.companyName ?? ""}</span>
+                <span className="font-bold text-foreground">{req?.companyName ?? ""}</span>
                 <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                  req?.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                  req?.status === "approved" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                  req?.status === "pending" ? "bg-warning/20 text-warning" :
+                  req?.status === "approved" ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive-foreground"
                 }`}>
                   {req?.status === "pending" ? "Pendiente" : req?.status === "approved" ? "Aprobado" : "Rechazado"}
                 </span>
               </div>
-              <p className="text-sm"><strong>NIT:</strong> {req?.companyNIT ?? ""}</p>
-              <p className="text-sm"><strong>Contacto:</strong> {req?.user?.name ?? ""} ({req?.user?.email ?? ""})</p>
-              <p className="text-sm"><strong>Ubicación:</strong> {req?.city ?? ""}, {req?.department ?? ""}</p>
-              {req?.companyPhone && <p className="text-sm"><strong>Teléfono:</strong> {req.companyPhone}</p>}
-              <p className="text-xs opacity-50 mt-1">{req?.createdAt ? new Date(req.createdAt).toLocaleDateString("es-CO") : ""}</p>
-              {req?.notes && <p className="text-xs mt-1 p-2 bg-gray-50 rounded"><strong>Notas:</strong> {req.notes}</p>}
+              <p className="text-sm text-foreground"><strong>NIT:</strong> {req?.companyNIT ?? ""}</p>
+              <p className="text-sm text-foreground"><strong>Contacto:</strong> {req?.user?.name ?? ""} ({req?.user?.email ?? ""})</p>
+              <p className="text-sm text-foreground"><strong>Ubicación:</strong> {req?.city ?? ""}, {req?.department ?? ""}</p>
+              {req?.companyPhone && <p className="text-sm text-foreground"><strong>Teléfono:</strong> {req.companyPhone}</p>}
+              <p className="text-xs text-muted-foreground mt-1">{req?.createdAt ? new Date(req.createdAt).toLocaleDateString("es-CO") : ""}</p>
+              {req?.notes && <p className="text-xs mt-1 p-2 bg-secondary rounded text-foreground"><strong>Notas:</strong> {req.notes}</p>}
               {req?.status === "pending" && (
                 <div className="mt-3 flex gap-2">
                   <button onClick={() => onApprove(req.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-md bg-green-100 text-green-700 hover:bg-green-200">
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-success/20 text-success hover:bg-success/30 transition-all">
                     <Check size={14} /> Aprobar
                   </button>
                   <button onClick={() => onReject(req.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-md bg-red-100 text-red-600 hover:bg-red-200">
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-destructive/20 text-destructive-foreground hover:bg-destructive/30 transition-all">
                     <XCircle size={14} /> Rechazar
                   </button>
                 </div>
@@ -801,10 +801,10 @@ function PriceTiersPanel({ products, fetchData }: { products: any[]; fetchData: 
 
   return (
     <div>
-      <h2 className="font-bold text-lg mb-4" style={{ color: "#1B2B5E" }}>Niveles de Precio por Volumen</h2>
-      <div className="bg-white p-4 rounded-lg border mb-4">
-        <label className="text-sm font-semibold block mb-2">Producto</label>
-        <select value={selectedProduct} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedProduct(e.target.value)} className="w-full px-3 py-2 border rounded-md text-sm">
+      <h2 className="font-bold text-lg mb-4 text-foreground">Niveles de Precio por Volumen</h2>
+      <div className="bg-card p-4 rounded-xl border border-border/50 mb-4">
+        <label className="text-sm font-semibold block mb-2 text-foreground">Producto</label>
+        <select value={selectedProduct} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedProduct(e.target.value)} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
           <option value="">Seleccionar producto...</option>
           {(products ?? []).map((p: any) => (
             <option key={p?.id} value={p?.id}>{p?.name ?? ""} ({p?.sku ?? ""})</option>
@@ -812,47 +812,47 @@ function PriceTiersPanel({ products, fetchData }: { products: any[]; fetchData: 
         </select>
       </div>
       {selectedProduct && (
-        <div className="bg-white p-4 rounded-lg border">
+        <div className="bg-card p-4 rounded-xl border border-border/50">
           {loading ? (
-            <div className="text-center py-4"><Loader2 className="animate-spin mx-auto" /></div>
+            <div className="text-center py-4"><Loader2 className="animate-spin mx-auto text-primary" /></div>
           ) : (
             <>
-              {tiers.length === 0 && <p className="text-sm opacity-50 mb-4">Sin niveles configurados.</p>}
+              {tiers.length === 0 && <p className="text-sm text-muted-foreground mb-4">Sin niveles configurados.</p>}
               <div className="space-y-3">
                 {tiers.map((tier: any, i: number) => (
-                  <div key={i} className="flex items-center gap-2 p-3 bg-gray-50 rounded-md">
+                  <div key={i} className="flex items-center gap-2 p-3 bg-secondary rounded-lg">
                     <div className="flex-1">
-                      <label className="text-xs font-semibold">Mín</label>
+                      <label className="text-xs font-semibold text-muted-foreground">Mín</label>
                       <input type="number" value={tier.minQty} min={1} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const newTiers = [...tiers]; newTiers[i].minQty = parseInt(e.target.value) || 1; setTiers(newTiers);
-                      }} className="w-full px-2 py-1 border rounded text-sm" />
+                      }} className="w-full px-2 py-1 bg-card border border-input rounded text-sm text-foreground" />
                     </div>
                     <div className="flex-1">
-                      <label className="text-xs font-semibold">Máx</label>
+                      <label className="text-xs font-semibold text-muted-foreground">Máx</label>
                       <input type="number" value={tier.maxQty ?? ""} min={0} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const newTiers = [...tiers]; newTiers[i].maxQty = e.target.value ? parseInt(e.target.value) : null; setTiers(newTiers);
-                      }} className="w-full px-2 py-1 border rounded text-sm" />
+                      }} className="w-full px-2 py-1 bg-card border border-input rounded text-sm text-foreground" />
                     </div>
                     <div className="flex-1">
-                      <label className="text-xs font-semibold">Precio</label>
+                      <label className="text-xs font-semibold text-muted-foreground">Precio</label>
                       <input type="number" value={tier.price} min={0} step={100} onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const newTiers = [...tiers]; newTiers[i].price = parseFloat(e.target.value) || 0; setTiers(newTiers);
-                      }} className="w-full px-2 py-1 border rounded text-sm" />
+                      }} className="w-full px-2 py-1 bg-card border border-input rounded text-sm text-foreground" />
                     </div>
-                    <button onClick={() => setTiers((prev: any) => prev.filter((_: any, idx: number) => idx !== i))} className="mt-4 p-1.5 hover:bg-red-100 rounded text-red-500"><X size={14} /></button>
+                    <button onClick={() => setTiers((prev: any) => prev.filter((_: any, idx: number) => idx !== i))} className="mt-4 p-1.5 hover:bg-destructive/20 rounded text-destructive transition-colors"><X size={14} /></button>
                   </div>
                 ))}
               </div>
               <div className="flex gap-2 mt-4">
                 <button onClick={() => setTiers((prev: any) => [...prev, { minQty: 1, maxQty: null, price: 0, membershipLevel: null }])}
-                  className="px-3 py-1.5 text-xs font-bold rounded-md border hover:bg-gray-50">+ Agregar Nivel</button>
+                  className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">+ Agregar Nivel</button>
                 <button onClick={async () => {
                   if (!selectedProduct) return;
                   try {
                     const res = await fetch("/api/admin/price-tiers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId: selectedProduct, tiers }) });
                     if (res.ok) { toast.success("Niveles guardados"); fetchData(); } else toast.error("Error al guardar");
                   } catch { toast.error("Error al guardar"); }
-                }} className="px-4 py-1.5 text-xs font-bold rounded-md text-white" style={{ background: "#1B2B5E" }}>Guardar Niveles</button>
+                }} className="px-4 py-1.5 text-xs font-bold rounded-lg text-white shadow-glow" style={{ background: "#1B2B5E" }}>Guardar Niveles</button>
               </div>
             </>
           )}
@@ -912,76 +912,76 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-card rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border border-border/50 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold" style={{ color: "#1B2B5E" }}>{isEdit ? "Editar Producto" : "Nuevo Producto"}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded"><X size={20} /></button>
+          <h2 className="text-xl font-bold text-foreground">{isEdit ? "Editar Producto" : "Nuevo Producto"}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-semibold block mb-1">Nombre *</label>
-              <input type="text" required value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Nombre *</label>
+              <input type="text" required value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">SKU *</label>
-              <input type="text" required value={form.sku} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, sku: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">SKU *</label>
+              <input type="text" required value={form.sku} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, sku: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">Precio *</label>
-              <input type="number" required value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Precio *</label>
+              <input type="number" required value={form.price} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, price: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">Precio Mayorista</label>
-              <input type="number" value={form.wholesalePrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, wholesalePrice: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Precio Mayorista</label>
+              <input type="number" value={form.wholesalePrice} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, wholesalePrice: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">Mínimo Mayorista</label>
-              <input type="number" value={form.wholesaleMinQty} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, wholesaleMinQty: parseInt(e.target.value) || 6 })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Mínimo Mayorista</label>
+              <input type="number" value={form.wholesaleMinQty} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, wholesaleMinQty: parseInt(e.target.value) || 6 })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">Stock</label>
-              <input type="number" value={form.stock} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, stock: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 border rounded-md text-sm" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Stock</label>
+              <input type="number" value={form.stock} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, stock: parseInt(e.target.value) || 0 })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1">Categoría *</label>
-              <select value={form.categoryId} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, categoryId: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm">
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Categoría *</label>
+              <select value={form.categoryId} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm({ ...form, categoryId: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
                 {(categories ?? []).map((c: any) => <option key={c?.id} value={c?.id}>{c?.name ?? ""}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2 pt-6">
-              <input type="checkbox" checked={form.featured} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4" />
-              <label className="text-sm font-semibold">Destacado</label>
+              <input type="checkbox" checked={form.featured} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 accent-primary" />
+              <label className="text-sm font-semibold text-muted-foreground">Destacado</label>
             </div>
           </div>
           <div>
-            <label className="text-sm font-semibold block mb-1">Descripción</label>
-            <textarea value={form.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 border rounded-md text-sm h-20 resize-none" />
+            <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Descripción</label>
+            <textarea value={form.description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm({ ...form, description: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 h-20 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" />
           </div>
           <div>
-            <label className="text-sm font-semibold block mb-2">Imágenes</label>
+            <label className="text-sm font-semibold block mb-2 text-muted-foreground">Imágenes</label>
             <div className="flex gap-2 flex-wrap mb-2">
               {(imageUrls ?? []).map((url: string, i: number) => (
-                <div key={i} className="relative w-16 h-16 rounded border overflow-hidden group">
+                <div key={i} className="relative w-16 h-16 rounded-lg border border-border/50 overflow-hidden group">
                   <Image src={url} alt="" fill className="object-cover" sizes="64px" />
                   <button type="button" onClick={() => setImageUrls((prev: string[]) => prev.filter((_: string, idx: number) => idx !== i))}
                     className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><X size={14} className="text-white" /></button>
                 </div>
               ))}
-              <label className="w-16 h-16 border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-gray-50">
-                {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} className="opacity-40" />}
+              <label className="w-16 h-16 border-2 border-dashed border-border/50 rounded-lg flex items-center justify-center cursor-pointer hover:bg-secondary transition-colors">
+                {uploading ? <Loader2 size={16} className="animate-spin text-muted-foreground" /> : <Upload size={16} className="text-muted-foreground" />}
                 <input type="file" accept="image/*" className="hidden" onChange={(e: React.ChangeEvent<HTMLInputElement>) => { const file = e.target.files?.[0]; if (file) handleUploadImage(file); }} />
               </label>
             </div>
             <div className="flex gap-2">
-              <input type="text" placeholder="O pega URL de imagen" value={newImageUrl} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewImageUrl(e.target.value)} className="flex-1 px-3 py-1.5 border rounded-md text-sm" />
-              <button type="button" onClick={() => { if (newImageUrl) { setImageUrls((prev: string[]) => [...prev, newImageUrl]); setNewImageUrl(""); } }} className="px-3 py-1.5 text-xs font-bold rounded-md border hover:bg-gray-50">Agregar</button>
+              <input type="text" placeholder="O pega URL de imagen" value={newImageUrl} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewImageUrl(e.target.value)} className="flex-1 px-3 py-1.5 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <button type="button" onClick={() => { if (newImageUrl) { setImageUrls((prev: string[]) => [...prev, newImageUrl]); setNewImageUrl(""); } }} className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">Agregar</button>
             </div>
           </div>
           <div className="flex gap-3 pt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold border rounded-md hover:bg-gray-50">Cancelar</button>
-            <button type="submit" disabled={loading} className="flex items-center gap-2 px-6 py-2 text-white text-sm font-bold rounded-md disabled:opacity-50" style={{ background: "#1B2B5E" }}>
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-semibold border border-border/50 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">Cancelar</button>
+            <button type="submit" disabled={loading} className="flex items-center gap-2 px-6 py-2 text-white text-sm font-bold rounded-lg shadow-glow disabled:opacity-50 transition-all" style={{ background: "#1B2B5E" }}>
               {loading ? <Loader2 size={14} className="animate-spin" /> : null} {isEdit ? "Actualizar" : "Crear Producto"}
             </button>
           </div>
@@ -994,8 +994,8 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
 /* ====== UI COMPONENTS ====== */
 function TabButton({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-md transition-all duration-200 ${
-      active ? "text-white shadow-md" : "text-gray-600 bg-white border hover:bg-gray-50"
+    <button onClick={onClick} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-lg transition-all duration-200 ${
+      active ? "text-white shadow-lg shadow-primary/20" : "text-muted-foreground bg-card border border-border/50 hover:bg-secondary hover:text-foreground"
     }`} style={active ? { background: "#1B2B5E" } : {}}>
       {icon} {label}
     </button>
@@ -1004,14 +1004,14 @@ function TabButton({ active, onClick, icon, label }: { active: boolean; onClick:
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
   return (
-    <div className="bg-white rounded-xl border p-4 hover:shadow-lg transition-shadow">
+    <div className="bg-card rounded-xl border border-border/50 p-4 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:border-primary/20">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: `${color}15`, color }}>
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10" style={{ color }}>
           {icon}
         </div>
         <div>
-          <p className="text-xs opacity-50 uppercase tracking-wider font-semibold">{label}</p>
-          <p className="text-xl font-bold" style={{ color }}>{value}</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
+          <p className="text-xl font-bold text-foreground">{value}</p>
         </div>
       </div>
     </div>
@@ -1020,8 +1020,8 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
 
 function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center gap-2 px-4 py-3 bg-white rounded-xl border text-sm font-semibold hover:bg-gray-50 hover:shadow-md transition-all">
-      <span className="opacity-40">{icon}</span> {label}
+    <button onClick={onClick} className="flex items-center gap-2 px-4 py-3 bg-card rounded-xl border border-border/50 text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all">
+      <span className="text-muted-foreground">{icon}</span> {label}
     </button>
   );
 }

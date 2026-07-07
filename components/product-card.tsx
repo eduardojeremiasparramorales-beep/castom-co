@@ -79,15 +79,15 @@ export function ProductCard({ product }: ProductCardProps) {
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={handleMouseLeave}
-          className="card-3d-glow relative bg-gray-50 rounded-lg overflow-hidden"
+          className="card-3d-glow relative bg-card border border-border/50 rounded-lg overflow-hidden"
           style={{
             transform: isHovered
               ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-6px)`
               : "rotateX(0deg) rotateY(0deg) translateY(0px)",
             transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
             boxShadow: isHovered
-              ? "0 20px 40px -10px rgba(27, 43, 94, 0.25), 0 0 0 1px rgba(27, 43, 94, 0.1)"
-              : "0 2px 8px rgba(0,0,0,0.04)",
+              ? "0 20px 40px -10px rgba(27, 43, 94, 0.3), 0 0 0 1px rgba(27, 43, 94, 0.15), 0 0 40px rgba(27, 43, 94, 0.05)"
+              : "0 2px 8px rgba(0,0,0,0.2)",
             transformStyle: "preserve-3d",
             "--mouse-x": `${glowPos.x}%`,
             "--mouse-y": `${glowPos.y}%`,
@@ -116,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </span>
               )}
               {lowStock && (
-                <span className="absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded bg-amber-100 text-amber-800 animate-pulse">
+                <span className="absolute top-3 right-3 text-xs font-bold px-2 py-1 rounded bg-destructive/20 text-destructive-foreground animate-pulse">
                   ¡Quedan {product.stock}!
                 </span>
               )}
@@ -124,7 +124,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
             <button
               onClick={handleAddToCart}
-              className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300"
+              className="absolute bottom-3 right-3 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-300 shadow-lg"
               style={{
                 background: "#1B2B5E",
                 opacity: isHovered ? 1 : 0,
@@ -136,21 +136,21 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         </div>
         <div className="mt-3 px-1">
-          <p className="text-xs uppercase tracking-wider opacity-50 font-semibold">{product?.category?.name ?? ""}</p>
-          <h3 className="font-bold text-sm mt-1 group-hover:opacity-70 transition-opacity" style={{ color: "#1B2B5E" }}>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{product?.category?.name ?? ""}</p>
+          <h3 className="font-bold text-sm mt-1 text-foreground group-hover:text-primary transition-colors">
             {product?.name ?? "Producto"}
           </h3>
           <div className="flex items-center gap-2 mt-1">
-            <span className="font-bold text-base" style={{ color: "#1B2B5E" }}>
+            <span className="font-bold text-base text-foreground">
               {formatPrice(product?.price ?? 0)}
             </span>
             {canWholesale && hasWholesale && (
-              <span className="text-xs opacity-50">
+              <span className="text-xs text-muted-foreground">
                 Mayorista: {formatPrice(product?.wholesalePrice ?? 0)}
               </span>
             )}
             {!canWholesale && hasWholesale && (
-              <span className="text-xs flex items-center gap-1 opacity-50">
+              <span className="text-xs flex items-center gap-1 text-muted-foreground">
                 <TrendingDown size={12} /> Precio especial
               </span>
             )}

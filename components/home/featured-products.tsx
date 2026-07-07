@@ -18,7 +18,7 @@ export function FeaturedProducts() {
   }, []);
 
   return (
-    <section className="py-16 md:py-24 relative">
+      <section className="py-16 md:py-24 relative">
       <div className="max-w-[1200px] mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -33,14 +33,14 @@ export function FeaturedProducts() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <Sparkles size={20} style={{ color: "#1B2B5E" }} className="animate-pulse" />
-            <p className="text-xs font-mono uppercase tracking-[0.3em] opacity-50">Destacados</p>
+            <Sparkles size={20} className="text-primary animate-pulse" />
+            <p className="text-xs font-mono uppercase tracking-[0.3em] text-muted-foreground">Destacados</p>
           </motion.div>
-          <h2 className="text-3xl md:text-4xl font-extrabold font-display tracking-tight" style={{ color: "#1B2B5E" }}>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-display tracking-tight text-foreground">
             Productos Destacados
           </h2>
           <motion.p
-            className="mt-2 opacity-50 text-sm"
+            className="mt-2 text-muted-foreground text-sm"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -59,7 +59,7 @@ export function FeaturedProducts() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.1 }}
               >
-                <div className="bg-gray-100 rounded-lg aspect-square animate-pulse" />
+                <div className="bg-secondary rounded-lg aspect-square animate-pulse" />
               </motion.div>
             ))}
           </div>
