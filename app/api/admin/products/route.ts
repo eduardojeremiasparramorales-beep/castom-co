@@ -34,8 +34,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description, price, wholesalePrice, wholesaleMinQty, sku, stock, categoryId, featured, images, variants } = body ?? {};
 
-    if (!name || !price || !sku || !categoryId) {
+    if (!name || !price || !categoryId) {
       return NextResponse.json({ error: "Campos requeridos faltantes" }, { status: 400 });
+    }
+
+    // Auto-generate SKU if not provided
+    let finalSku = sku;
+    if (!finalSku) {
+      const cat = await prisma.category.findUnique({ where: { id: categoryId } });
+      const prefix = (cat?.name ?? "PROD").substring(0, 3).toUpperCase();
+      let attempts = 0;
+      while (attempts < 10) {
+        const candidate = `${prefix}-${String(Math.floor(1000 + Math.random() * 9000))}`;
+        const existing = await prisma.product.findUnique({ where: { sku: candidate } });
+        if (!existing) { finalSku = candidate; break; }
+        attempts++;
+      }
+      if (!finalSku) finalSku = `${prefix}-${Date.now().toString(36).toUpperCase()}`;
     }
 
     const slug = (name as string)
@@ -51,7 +66,7 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         wholesalePrice: wholesalePrice ? parseFloat(wholesalePrice) : null,
         wholesaleMinQty: wholesaleMinQty ?? 6,
-        sku,
+        sku: finalSku,
         stock: stock ?? 0,
         featured: featured ?? false,
         categoryId,

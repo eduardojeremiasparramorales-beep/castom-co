@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Package } from "lucide-react";
+import { useTheme } from "next-themes";
+import { ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Package, Sun, Moon } from "lucide-react";
 import { getCart } from "@/lib/cart";
 
 export function Header() {
@@ -34,6 +35,8 @@ export function Header() {
   }, []);
 
   const isAdmin = (session?.user as any)?.role === "admin";
+  const isSeller = (session?.user as any)?.role === "seller";
+  const { theme, setTheme } = useTheme();
 
   return (
     <header
@@ -92,8 +95,26 @@ export function Header() {
                   Admin
                 </Link>
               )}
+              {isSeller && (
+                <Link
+                  href="/vendedor"
+                  className="hidden md:flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg bg-primary/30 text-white hover:bg-primary/50 transition-all duration-300"
+                >
+                  <LayoutDashboard size={13} />
+                  Vendedor
+                </Link>
+              )}
             </>
           )}
+
+          {/* Theme Toggle */}
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="hidden md:flex items-center justify-center w-8 h-8 rounded-full text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300"
+            title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          >
+            {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
 
           {status === "authenticated" ? (
             <button

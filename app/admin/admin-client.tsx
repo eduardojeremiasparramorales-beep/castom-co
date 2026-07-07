@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
   Package, ShoppingBag, Plus, Edit, Eye, EyeOff, Loader2, X, Upload, Users, Tags,
   Check, XCircle, TrendingUp, DollarSign, AlertTriangle, Download, FileText,
   BarChart3, UserCheck, Calendar, Search, ChevronDown, Clock, MessageSquare,
-  PieChart, ArrowUp, ArrowDown, Zap, Box, Activity
+  PieChart, ArrowUp, ArrowDown, Zap, Box, Activity, Trash2, Sun, Moon, Settings
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -21,7 +22,8 @@ const COLORS = ["#1B2B5E", "#2D4A8E", "#3D5CA0", "#4D6DB0", "#6B8BCE", "#8BA8E0"
 export function AdminClient() {
   const { data: session, status } = useSession() || {};
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "products" | "orders" | "customers" | "requests" | "pricetiers">("dashboard");
+  const { theme, setTheme } = useTheme();
+  const [activeTab, setActiveTab] = useState<"dashboard" | "products" | "orders" | "customers" | "requests" | "pricetiers" | "ajustes">("dashboard");
   const [products, setProducts] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
@@ -186,6 +188,13 @@ export function AdminClient() {
           <p className="text-sm text-muted-foreground mt-1">Bienvenido, {session?.user?.name || "Admin"}</p>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-lg bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/20 transition-all"
+            title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           <span className="text-xs text-muted-foreground">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
         </div>
       </div>
@@ -198,6 +207,7 @@ export function AdminClient() {
         <TabButton active={activeTab === "customers"} onClick={() => setActiveTab("customers")} icon={<Users size={16} />} label={`Clientes (${customers?.length ?? 0})`} />
         <TabButton active={activeTab === "requests"} onClick={() => setActiveTab("requests")} icon={<UserCheck size={16} />} label={`Solicitudes (${requests?.length ?? 0})`} />
         <TabButton active={activeTab === "pricetiers"} onClick={() => setActiveTab("pricetiers")} icon={<Tags size={16} />} label="Niveles de Precio" />
+        <TabButton active={activeTab === "ajustes"} onClick={() => setActiveTab("ajustes")} icon={<Settings size={16} />} label="Ajustes" />
       </div>
 
       {/* DASHBOARD TAB */}
@@ -207,6 +217,10 @@ export function AdminClient() {
           orderStatusData={orderStatusData}
           todayOrders={todayOrders}
           formatPrice={formatPrice}
+          onNewProduct={() => { setEditingProduct(null); setShowForm(true); }}
+          onGoToRequests={() => setActiveTab("requests")}
+          onRefresh={fetchData}
+          onExport={exportOrders}
         />
       )}
 
@@ -233,9 +247,18 @@ export function AdminClient() {
               toast.success("Stock actualizado");
             } catch { toast.error("Error al actualizar stock"); }
           }}
-          onNewProduct={() => { setEditingProduct(null); setShowForm(true); }}
-          onEditProduct={(p: any) => { setEditingProduct(p); setShowForm(true); }}
-          onCloseForm={() => { setShowForm(false); setEditingProduct(null); }}
+            onNewProduct={() => { setEditingProduct(null); setShowForm(true); }}
+            onEditProduct={(p: any) => { setEditingProduct(p); setShowForm(true); }}
+            onDeleteProduct={async (id: string) => {
+              if (!window.confirm("¿Eliminar este producto permanentemente?")) return;
+              try {
+                const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+                if (!res.ok) throw new Error();
+                toast.success("Producto eliminado");
+                fetchData();
+              } catch { toast.error("Error al eliminar"); }
+            }}
+            onCloseForm={() => { setShowForm(false); setEditingProduct(null); }}
           onSaved={() => { setShowForm(false); setEditingProduct(null); fetchData(); }}
         />
       )}
@@ -295,6 +318,11 @@ export function AdminClient() {
         <PriceTiersPanel products={products} fetchData={fetchData} />
       )}
 
+      {/* Ajustes Tab */}
+      {activeTab === "ajustes" && (
+        <AjustesTab />
+      )}
+
       {/* Product Form Modal */}
       {showForm && (
         <ProductFormModal
@@ -309,8 +337,9 @@ export function AdminClient() {
 }
 
 /* ====== DASHBOARD TAB ====== */
-function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
+function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice, onNewProduct, onGoToRequests, onRefresh, onExport }: {
   stats: any; orderStatusData: any[]; todayOrders: any[]; formatPrice: (p: number) => string;
+  onNewProduct: () => void; onGoToRequests: () => void; onRefresh: () => void; onExport: () => void;
 }) {
   const statusLabels: Record<string, string> = {
     pendiente: "Pendiente", pagado: "Pagado", confirmado: "Confirmado",
@@ -454,17 +483,17 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice }: {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <QuickAction icon={<Plus size={16} />} label="Nuevo Producto" onClick={() => {}} />
-        <QuickAction icon={<Download size={16} />} label="Exportar Datos" onClick={() => {}} />
-        <QuickAction icon={<UserCheck size={16} />} label="Solicitudes" onClick={() => {}} />
-        <QuickAction icon={<Zap size={16} />} label="Actualizar" onClick={() => {}} />
+        <QuickAction icon={<Plus size={16} />} label="Nuevo Producto" onClick={onNewProduct} />
+        <QuickAction icon={<Download size={16} />} label="Exportar Datos" onClick={onExport} />
+        <QuickAction icon={<UserCheck size={16} />} label="Solicitudes" onClick={onGoToRequests} />
+        <QuickAction icon={<Zap size={16} />} label="Actualizar" onClick={onRefresh} />
       </div>
     </div>
   );
 }
 
 /* ====== PRODUCTS TAB ====== */
-function ProductsTab({ products, loading, categories, showForm, editingProduct, formatPrice, onToggleActive, onUpdateStock, onNewProduct, onEditProduct, onCloseForm, onSaved }: any) {
+function ProductsTab({ products, loading, categories, showForm, editingProduct, formatPrice, onToggleActive, onUpdateStock, onNewProduct, onEditProduct, onDeleteProduct, onCloseForm, onSaved }: any) {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -540,6 +569,9 @@ function ProductsTab({ products, loading, categories, showForm, editingProduct, 
                         <button onClick={() => onEditProduct(p)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors" title="Editar"><Edit size={14} /></button>
                         <button onClick={() => onToggleActive(p?.id, p?.active)} className="p-1.5 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors" title={p?.active ? "Desactivar" : "Activar"}>
                           {p?.active ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                        <button onClick={() => onDeleteProduct(p?.id)} className="p-1.5 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors" title="Eliminar">
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
@@ -896,7 +928,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.price || !form.sku || !form.categoryId) { toast.error("Completa los campos requeridos"); return; }
+    if (!form.name || !form.price || !form.categoryId) { toast.error("Completa los campos requeridos"); return; }
     setLoading(true);
     try {
       const payload = { ...form, images: imageUrls.map((url: string, i: number) => ({ url, alt: form.name, position: i, isPublic: true })) };
@@ -925,8 +957,18 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
               <input type="text" required value={form.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div>
-              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">SKU *</label>
-              <input type="text" required value={form.sku} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, sku: e.target.value })} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">SKU {!isEdit && <span className="text-muted-foreground/50 font-normal">(opcional)</span>}</label>
+              <div className="flex gap-2">
+                <input type="text" value={form.sku} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, sku: e.target.value })} className="flex-1 px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder={isEdit ? "" : "Se genera automáticamente"} />
+                {!isEdit && (
+                  <button type="button" onClick={() => {
+                    const cat = categories.find((c: any) => c.id === form.categoryId);
+                    const prefix = (cat?.name ?? "PROD").substring(0, 3).toUpperCase();
+                    const code = String(Math.floor(1000 + Math.random() * 9000));
+                    setForm({ ...form, sku: `${prefix}-${code}` });
+                  }} className="px-3 py-2 text-xs font-bold rounded-lg border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all">Generar</button>
+                )}
+              </div>
             </div>
             <div>
               <label className="text-sm font-semibold block mb-1.5 text-muted-foreground">Precio *</label>
@@ -987,6 +1029,118 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+/* ====== AJUSTES TAB ====== */
+function AjustesTab() {
+  const { theme, setTheme } = useTheme();
+  const [form, setForm] = useState({
+    storeName: "CASTOM.CO",
+    storeEmail: "info@castom.co",
+    storePhone: "",
+    address: "Acacías, Meta",
+    nequiNumber: "",
+    bankName: "Bancolombia",
+    bankAccount: "",
+    bankOwner: "",
+  });
+
+  const handleSave = () => {
+    localStorage.setItem("castom-store-settings", JSON.stringify(form));
+    toast.success("Ajustes guardados localmente");
+  };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("castom-store-settings");
+      if (saved) setForm({ ...form, ...JSON.parse(saved) });
+    } catch {}
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Información del negocio */}
+        <div className="bg-card p-6 rounded-xl border border-border/50">
+          <h3 className="font-bold text-lg text-foreground mb-4">Información del Negocio</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Nombre Tienda</label>
+              <input type="text" value={form.storeName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, storeName: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Email</label>
+              <input type="email" value={form.storeEmail} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, storeEmail: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Teléfono</label>
+              <input type="text" value={form.storePhone} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, storePhone: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Dirección</label>
+              <input type="text" value={form.address} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, address: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+          </div>
+        </div>
+
+        {/* Métodos de pago */}
+        <div className="bg-card p-6 rounded-xl border border-border/50">
+          <h3 className="font-bold text-lg text-foreground mb-4">Métodos de Pago</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Nequi</label>
+              <input type="text" value={form.nequiNumber} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, nequiNumber: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" placeholder="Número Nequi" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Banco</label>
+              <input type="text" value={form.bankName} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, bankName: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Cuenta Bancaria</label>
+              <input type="text" value={form.bankAccount} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, bankAccount: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+            <div>
+              <label className="text-sm font-semibold block mb-1 text-muted-foreground">Titular</label>
+              <input type="text" value={form.bankOwner} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm({ ...form, bankOwner: e.target.value })}
+                className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tema */}
+      <div className="bg-card p-6 rounded-xl border border-border/50">
+        <h3 className="font-bold text-lg text-foreground mb-4">Apariencia</h3>
+        <div className="flex items-center gap-4">
+          <button onClick={() => setTheme("dark")} className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${theme === "dark" ? "border-primary bg-primary/10" : "border-border/50 bg-secondary"}`}>
+            <Moon size={20} className={theme === "dark" ? "text-primary" : "text-muted-foreground"} />
+            <div className="text-left">
+              <p className="font-bold text-sm text-foreground">Oscuro</p>
+              <p className="text-xs text-muted-foreground">Modo nocturno</p>
+            </div>
+          </button>
+          <button onClick={() => setTheme("light")} className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${theme === "light" ? "border-primary bg-primary/10" : "border-border/50 bg-secondary"}`}>
+            <Sun size={20} className={theme === "light" ? "text-primary" : "text-muted-foreground"} />
+            <div className="text-left">
+              <p className="font-bold text-sm text-foreground">Claro</p>
+              <p className="text-xs text-muted-foreground">Modo diurno</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <button onClick={handleSave} className="px-6 py-2.5 text-white text-sm font-bold rounded-lg shadow-glow" style={{ background: "#1B2B5E" }}>
+        Guardar Ajustes
+      </button>
     </div>
   );
 }

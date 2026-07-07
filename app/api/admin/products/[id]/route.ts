@@ -67,9 +67,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   }
 
   try {
-    await prisma.product.update({
+    await prisma.product.delete({
       where: { id: params.id },
-      data: { active: false },
     });
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -31,7 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
     if (!rect) return;
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    setTilt({ x: (y - 0.5) * 15, y: (x - 0.5) * -15 });
+    setTilt({ x: (y - 0.5) * 25, y: (x - 0.5) * -25 });
     setGlowPos({ x: x * 100, y: y * 100 });
   };
 
@@ -39,6 +39,26 @@ export function ProductCard({ product }: ProductCardProps) {
     setTilt({ x: 0, y: 0 });
     setIsHovered(false);
   };
+
+  // Simulated 360 rotation on idle (only on desktop, pauses on hover)
+  const [idleRotate, setIdleRotate] = useState(0);
+  useEffect(() => {
+    const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) return;
+    let frame: number;
+    let start = Date.now();
+    const animate = () => {
+      if (!isHovered) {
+        const elapsed = (Date.now() - start) / 1000;
+        setIdleRotate((elapsed * 15) % 360);
+      } else {
+        start = Date.now();
+      }
+      frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [isHovered]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -82,33 +102,39 @@ export function ProductCard({ product }: ProductCardProps) {
           className="card-3d-glow relative bg-card border border-border/50 rounded-lg overflow-hidden"
           style={{
             transform: isHovered
-              ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-6px)`
-              : "rotateX(0deg) rotateY(0deg) translateY(0px)",
-            transition: "transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
+              ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-8px) scale(1.02)`
+              : `perspective(800px) rotateY(${idleRotate}deg)`,
+            transition: isHovered
+              ? "transform 0.1s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease"
+              : "transform 0.8s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
             boxShadow: isHovered
-              ? "0 20px 40px -10px rgba(27, 43, 94, 0.3), 0 0 0 1px rgba(27, 43, 94, 0.15), 0 0 40px rgba(27, 43, 94, 0.05)"
+              ? "0 25px 50px -12px rgba(27, 43, 94, 0.4), 0 0 0 1px rgba(27, 43, 94, 0.2), 0 0 60px rgba(27, 43, 94, 0.08)"
               : "0 2px 8px rgba(0,0,0,0.2)",
             transformStyle: "preserve-3d",
             "--mouse-x": `${glowPos.x}%`,
             "--mouse-y": `${glowPos.y}%`,
           } as React.CSSProperties}
         >
-          <div className="relative aspect-square">
-            <div className="relative w-full h-full">
+            <div className="relative aspect-square overflow-hidden">
+            <div className="relative w-full h-full transition-transform duration-[800ms]"
+              style={{
+                transform: isHovered ? "scale(1.12)" : "scale(1)",
+              }}
+            >
               <Image
                 src={mainImage}
                 alt={product?.name ?? "Producto"}
                 fill
-                className="object-cover transition-transform duration-700"
-                style={{
-                  transform: isHovered ? "scale(1.08)" : "scale(1)",
-                }}
+                className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
             </div>
 
+            {/* Overlay gradient on hover */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
             {/* 3D floating badges layer */}
-            <div style={{ transform: "translateZ(20px)" }}>
+            <div style={{ transform: isHovered ? "translateZ(40px)" : "translateZ(20px)", transition: "transform 0.3s ease" }}>
               {hasWholesale && (
                 <span className="absolute top-3 left-3 text-white text-xs font-bold px-2 py-1 rounded flex items-center gap-1" style={{ background: "#1B2B5E" }}>
                   <Tag size={12} />
@@ -128,7 +154,7 @@ export function ProductCard({ product }: ProductCardProps) {
               style={{
                 background: "#1B2B5E",
                 opacity: isHovered ? 1 : 0,
-                transform: isHovered ? "translateZ(30px) scale(1.1)" : "translateZ(0) scale(0.9)",
+                transform: isHovered ? "translateZ(50px) scale(1.15)" : "translateZ(0) scale(0.85)",
               }}
             >
               <ShoppingCart size={16} />
