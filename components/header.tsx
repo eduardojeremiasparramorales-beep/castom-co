@@ -43,7 +43,7 @@ export function Header() {
       ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "glass-nav shadow-lg shadow-black/10"
+          ? "liquid-glass-nav shadow-lg shadow-black/20"
           : "bg-transparent"
       }`}
       style={{
@@ -53,7 +53,7 @@ export function Header() {
       <div className="max-w-[1200px] mx-auto px-4 flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-display group">
-          <span className="text-2xl md:text-3xl font-extrabold tracking-tight text-white text-glow">
+          <span className="text-2xl md:text-3xl font-extrabold tracking-tight text-white text-glow-cosmic">
             CASTOM<span className="text-sm font-bold opacity-60">.CO</span>
           </span>
         </Link>
@@ -162,8 +162,8 @@ export function Header() {
       {/* Mobile menu */}
       {menuOpen && (
         <div
-          className="md:hidden border-t border-white/5 px-4 pb-6 shadow-2xl backdrop-blur-2xl"
-          style={{ background: "hsl(230 10% 4% / 0.95)" }}
+          className="md:hidden border-t border-white/5 px-4 pb-6 shadow-2xl"
+          style={{ background: "hsl(224 25% 5% / 0.85)", backdropFilter: "blur(32px)" }}
         >
           <nav className="flex flex-col gap-1 pt-4">
             {[

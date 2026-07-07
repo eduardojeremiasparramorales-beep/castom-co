@@ -178,24 +178,26 @@ export function AdminClient() {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-8">
+    <div className="max-w-[1400px] mx-auto px-4 py-8 pt-24">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-extrabold font-display tracking-tight text-foreground">
-            Panel de Administración
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Bienvenido, {session?.user?.name || "Admin"}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg bg-card border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/20 transition-all"
-            title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
-          >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <span className="text-xs text-muted-foreground">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+      <div className="liquid-glass-card p-6 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold font-display tracking-tight text-foreground text-glow-cosmic">
+              Panel de Administración
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">Bienvenido, {session?.user?.name || "Admin"}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg liquid-glass-card text-muted-foreground hover:text-foreground transition-all"
+              title={theme === "dark" ? "Modo claro" : "Modo oscuro"}
+            >
+              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <span className="text-xs text-muted-foreground">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+          </div>
         </div>
       </div>
 
@@ -359,7 +361,7 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice, onNewP
       {/* Today + Alerts Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Today's orders */}
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Calendar size={14} /> Hoy
@@ -389,7 +391,7 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice, onNewP
         </div>
 
         {/* Stock alerts */}
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <AlertTriangle size={14} className="text-warning" /> Alertas de Stock
@@ -417,7 +419,7 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice, onNewP
         </div>
 
         {/* Status Pie */}
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
             <PieChart size={14} /> Pedidos por Estado
           </h3>
@@ -452,7 +454,7 @@ function DashboardTab({ stats, orderStatusData, todayOrders, formatPrice, onNewP
       </div>
 
       {/* Sales Chart */}
-      <div className="bg-card rounded-xl border border-border/50 p-4 md:p-6">
+      <div className="liquid-glass-card p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 text-foreground">
             <TrendingUp size={16} /> Ventas Mensuales
@@ -509,7 +511,7 @@ function ProductsTab({ products, loading, categories, showForm, editingProduct, 
       {loading ? (
         <div className="text-center py-8"><Loader2 className="animate-spin mx-auto text-primary" /></div>
       ) : (
-        <div className="bg-card rounded-xl border border-border/50 overflow-x-auto">
+        <div className="liquid-glass overflow-x-auto" style={{ borderRadius: "var(--radius-lg)" }}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-secondary/50">
@@ -625,7 +627,7 @@ function OrdersTab({ orders, loading, formatPrice, formatDate, search, onSearchC
           {orders.map((order: any) => {
             const isManual = order?.paymentMethod === "transfer" || order?.paymentMethod === "contraentrega";
             return (
-              <div key={order?.id} className="bg-card p-4 rounded-xl border border-border/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+              <div key={order?.id} className="liquid-glass-card p-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
                   <div className="flex items-center gap-2">
                     <span className="font-bold font-mono text-foreground">{order?.orderNumber ?? ""}</span>
@@ -721,7 +723,7 @@ function CustomersTab({ customers, loading, formatPrice, formatDate, onRefresh }
       ) : filtered.length === 0 ? (
         <p className="text-center py-8 text-muted-foreground">No hay clientes registrados</p>
       ) : (
-        <div className="bg-card rounded-xl border border-border/50 overflow-x-auto">
+        <div className="liquid-glass overflow-x-auto" style={{ borderRadius: "var(--radius-lg)" }}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-secondary/50">
@@ -779,7 +781,7 @@ function RequestsTab({ requests, loading, onApprove, onReject }: any) {
       ) : (
         <div className="space-y-4">
           {(requests ?? []).map((req: any) => (
-            <div key={req?.id} className="bg-card p-4 rounded-xl border border-border/50">
+            <div key={req?.id} className="liquid-glass-card p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-bold text-foreground">{req?.companyName ?? ""}</span>
                 <span className={`px-2 py-0.5 text-xs font-bold rounded ${
@@ -834,7 +836,7 @@ function PriceTiersPanel({ products, fetchData }: { products: any[]; fetchData: 
   return (
     <div>
       <h2 className="font-bold text-lg mb-4 text-foreground">Niveles de Precio por Volumen</h2>
-      <div className="bg-card p-4 rounded-xl border border-border/50 mb-4">
+      <div className="liquid-glass-card p-4 mb-4">
         <label className="text-sm font-semibold block mb-2 text-foreground">Producto</label>
         <select value={selectedProduct} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSelectedProduct(e.target.value)} className="w-full px-3 py-2 bg-secondary border border-input rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
           <option value="">Seleccionar producto...</option>
@@ -844,7 +846,7 @@ function PriceTiersPanel({ products, fetchData }: { products: any[]; fetchData: 
         </select>
       </div>
       {selectedProduct && (
-        <div className="bg-card p-4 rounded-xl border border-border/50">
+        <div className="liquid-glass-card p-4">
           {loading ? (
             <div className="text-center py-4"><Loader2 className="animate-spin mx-auto text-primary" /></div>
           ) : (
@@ -945,7 +947,7 @@ function ProductFormModal({ product, categories, onClose, onSaved }: { product: 
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-card rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 border border-border/50 shadow-2xl">
+      <div className="liquid-glass-modal w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-foreground">{isEdit ? "Editar Producto" : "Nuevo Producto"}</h2>
           <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
@@ -1063,7 +1065,7 @@ function AjustesTab() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Información del negocio */}
-        <div className="bg-card p-6 rounded-xl border border-border/50">
+        <div className="liquid-glass-card p-6">
           <h3 className="font-bold text-lg text-foreground mb-4">Información del Negocio</h3>
           <div className="space-y-4">
             <div>
@@ -1090,7 +1092,7 @@ function AjustesTab() {
         </div>
 
         {/* Métodos de pago */}
-        <div className="bg-card p-6 rounded-xl border border-border/50">
+        <div className="liquid-glass-card p-6">
           <h3 className="font-bold text-lg text-foreground mb-4">Métodos de Pago</h3>
           <div className="space-y-4">
             <div>
@@ -1118,7 +1120,7 @@ function AjustesTab() {
       </div>
 
       {/* Tema */}
-      <div className="bg-card p-6 rounded-xl border border-border/50">
+      <div className="liquid-glass-card p-6">
         <h3 className="font-bold text-lg text-foreground mb-4">Apariencia</h3>
         <div className="flex items-center gap-4">
           <button onClick={() => setTheme("dark")} className={`flex items-center gap-3 px-5 py-3 rounded-xl border-2 transition-all ${theme === "dark" ? "border-primary bg-primary/10" : "border-border/50 bg-secondary"}`}>
@@ -1158,7 +1160,7 @@ function TabButton({ active, onClick, icon, label }: { active: boolean; onClick:
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
   return (
-    <div className="bg-card rounded-xl border border-border/50 p-4 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:border-primary/20">
+    <div className="liquid-glass-card p-4">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10" style={{ color }}>
           {icon}
@@ -1174,7 +1176,7 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
 
 function QuickAction({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="flex items-center gap-2 px-4 py-3 bg-card rounded-xl border border-border/50 text-sm font-semibold text-muted-foreground hover:text-foreground hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all">
+    <button onClick={onClick} className="flex items-center gap-2 px-4 py-3 liquid-glass-card text-sm font-semibold text-muted-foreground hover:text-foreground transition-all">
       <span className="text-muted-foreground">{icon}</span> {label}
     </button>
   );

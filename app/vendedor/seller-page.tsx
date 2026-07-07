@@ -106,25 +106,25 @@ export function SellerPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary-light"><ShoppingBag size={20} /></div>
             <div><p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Total Pedidos</p><p className="text-xl font-bold text-foreground">{stats.total}</p></div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary-light"><TrendingUp size={20} /></div>
             <div><p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Hoy</p><p className="text-xl font-bold text-foreground">{stats.today}</p></div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-success/20 text-success"><DollarSign size={20} /></div>
             <div><p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Ingresos</p><p className="text-xl font-bold text-foreground">{formatPrice(stats.revenue)}</p></div>
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border/50 p-4">
+        <div className="liquid-glass-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-warning/20 text-warning"><Users size={20} /></div>
             <div><p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Pendientes</p><p className="text-xl font-bold text-foreground">{stats.pending}</p></div>
@@ -157,7 +157,7 @@ export function SellerPage() {
       ) : (
         <div className="space-y-3">
           {filteredOrders.map((order: any) => (
-            <div key={order.id} className="bg-card p-4 rounded-xl border border-border/50">
+            <div key={order.id} className="liquid-glass-card p-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="font-bold font-mono text-foreground">{order.orderNumber}</span>

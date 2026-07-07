@@ -3,6 +3,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { ChunkLoadErrorHandler } from "@/components/chunk-load-error-handler";
+import { SpaceBackground } from "@/components/space-background";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
       </head>
       <body
-        className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${dmSans.variable} ${jakartaSans.variable} ${jetbrainsMono.variable} font-sans antialiased space-gradient noise-bg`}
       >
         <Providers>
+          <SpaceBackground />
           {children}
           <Toaster />
           <ChunkLoadErrorHandler />

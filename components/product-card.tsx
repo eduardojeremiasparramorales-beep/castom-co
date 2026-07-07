@@ -99,7 +99,7 @@ export function ProductCard({ product }: ProductCardProps) {
           onMouseMove={handleMouseMove}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={handleMouseLeave}
-          className="card-3d-glow relative bg-card border border-border/50 rounded-lg overflow-hidden"
+          className="card-space liquid-glass-card rounded-xl overflow-hidden"
           style={{
             transform: isHovered
               ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-8px) scale(1.02)`
@@ -109,14 +109,15 @@ export function ProductCard({ product }: ProductCardProps) {
               : "transform 0.8s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease",
             boxShadow: isHovered
               ? "0 25px 50px -12px rgba(27, 43, 94, 0.4), 0 0 0 1px rgba(27, 43, 94, 0.2), 0 0 60px rgba(27, 43, 94, 0.08)"
-              : "0 2px 8px rgba(0,0,0,0.2)",
+              : "0 2px 8px rgba(0,0,0,0.3)",
             transformStyle: "preserve-3d",
             "--mouse-x": `${glowPos.x}%`,
             "--mouse-y": `${glowPos.y}%`,
+            borderRadius: "var(--radius-xl)",
           } as React.CSSProperties}
         >
             <div className="relative aspect-square overflow-hidden">
-            <div className="relative w-full h-full transition-transform duration-[800ms]"
+            <div className="relative w-full h-full transition-transform duration-1000"
               style={{
                 transform: isHovered ? "scale(1.12)" : "scale(1)",
               }}
